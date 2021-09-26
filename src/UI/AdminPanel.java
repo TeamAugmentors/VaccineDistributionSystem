@@ -45,6 +45,7 @@ public class AdminPanel extends javax.swing.JFrame {
     /**
      * Creates new form AdminPanel
      */
+    //
     JLabel[] labels;
     JPanel[] panels;
     String[] columnNames;
