@@ -29,14 +29,18 @@ public class DBConnection {
         connection = null;
         try {
 
+            String url = null;
+            String user = null;
+            String password = null;
+            
 //            <============MD. ATIKUR RAHMAN============>
 //            String password = "123456";
 //            String user = "Atiqur";
 //            String url = "jdbc:sqlserver://localhost\\SQLExpress:1433;databaseName=VaccinationCenter";
 //            <--------------- Ahmed Saad Tanim ------------->
-            String password = "123456";
-            String user = "AST";
-            String url = "jdbc:sqlserver://AST-PC\\SQLEXPRESS:1433;databaseName=VaccinationCenter";
+//            String password = "123456";
+//            String user = "AST";
+//            String url = "jdbc:sqlserver://AST-PC\\SQLEXPRESS:1433;databaseName=VaccinationCenter";
 //            <--------------- Sanjid Islam Chowdhury ----------->
 //            String password = "123456";
 //            String user = "san2";
