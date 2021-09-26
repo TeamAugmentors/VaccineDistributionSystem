@@ -7,21 +7,17 @@ package UI;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 import dbConnection.DBConnection;
-import java.awt.Button;
 import java.awt.event.ItemEvent;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Stack;
 import javax.swing.ImageIcon;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 /**
@@ -30,19 +26,37 @@ import javax.swing.JTextField;
  */
 public class RegisterForm extends javax.swing.JFrame {
 
-    private int state = 0;
-    
-    private HashMap<String, String[]> cityAreaMap = new HashMap<>();
+    private JPanel panels[];
+    private Stack<JPanel> panelStackBack = new Stack<>();
+    private Stack<JPanel> panelStackFront = new Stack<>();
 
+    private HashMap<String, String[]> cityAreaMap = new HashMap<>();
+    JPanel[] getPanelsArray(JPanel ...panels){
+        return panels;
+    }
     /**
      * Creates new form RegisterNIDFrame
      */
     private void setUpDropDowns() {
         backButton.setEnabled(false);
-
+        panels = getPanelsArray(panelForm, panelCovid, panelWelcome);
         jRadioButton3.setActionCommand("PERSON_NID");
         jRadioButton4.setActionCommand("PERSON_BIRTH_C");
 
+        jRadioButton1.setActionCommand("YES");
+        jRadioButton2.setActionCommand("NO");
+
+        jRadioButton5.setActionCommand("NO");
+        jRadioButton6.setActionCommand("YES");
+
+        panelCure.setVisible(false);
+
+        labelCured.setVisible(false);
+        
+        for (int i = 0; i < panels.length; i++) {
+            panelStackFront.push(panels[i]);
+        }
+        
         // I am gonna populate month date and year
         int startingYear = 2021;
 
@@ -63,9 +77,10 @@ public class RegisterForm extends javax.swing.JFrame {
         yearDropDown.setMaximumRowCount(7);
         monthDropDown.setMaximumRowCount(7);
         dayDropDown.setMaximumRowCount(7);
+
         cityDropDown.setMaximumRowCount(10);
         locationDropDown.setMaximumRowCount(10);
-        
+
         setAge(Integer.parseInt(yearDropDown.getSelectedItem().toString()));
 
         monthDropDown.addItemListener((e) -> {
@@ -82,12 +97,10 @@ public class RegisterForm extends javax.swing.JFrame {
         });
 
         //Populating City and Location Dropdowns
-
-
         try {
             ResultSet set = DBConnection.makeQuery("SELECT * FROM INFORMATION");
-            
-            while(set.next()){
+
+            while (set.next()) {
                 cityDropDown.addItem(set.getString("City"));
                 cityAreaMap.put(set.getString("City"), parseAreas(set.getString("Area")));
             }
@@ -95,16 +108,16 @@ public class RegisterForm extends javax.swing.JFrame {
         } catch (Exception ex) {
 
         }
-        
+
         cityDropDown.addItemListener((e) -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 locationDropDown.setModel((new JComboBox<>(cityAreaMap.get(e.getItem().toString()))).getModel());
             }
         });
     }
-    
-    String[] parseAreas(String areas){
-        if (areas.charAt(0) == '"'){
+
+    String[] parseAreas(String areas) {
+        if (areas.charAt(0) == '"') {
             return (areas.replace(String.valueOf('"'), "").split(","));
         } else {
             String[] string = new String[1];
@@ -145,11 +158,14 @@ public class RegisterForm extends javax.swing.JFrame {
         initComponents();
         getContentPane().requestFocusInWindow();
         setUpDropDowns();
-
-        attachPanel(panelWelcome);
+        attachPanel(panelStackFront.pop(), true);
     }
 
-    void attachPanel(JComponent component) {
+    void attachPanel(JComponent component, boolean pushIntoStack) {
+        if (pushIntoStack) {
+            panelStackBack.push((JPanel) component);
+        }
+        
         try {
             container.remove(container.getComponent(0));
         } catch (Exception e) {
@@ -177,6 +193,15 @@ public class RegisterForm extends javax.swing.JFrame {
         jLabel4 = new javax.swing.JLabel();
         jRadioButton3 = new javax.swing.JRadioButton();
         jRadioButton4 = new javax.swing.JRadioButton();
+        panelCovid = new javax.swing.JPanel();
+        jLabel12 = new javax.swing.JLabel();
+        jRadioButton1 = new javax.swing.JRadioButton();
+        jRadioButton2 = new javax.swing.JRadioButton();
+        panelCure = new javax.swing.JPanel();
+        jLabel6 = new javax.swing.JLabel();
+        jRadioButton5 = new javax.swing.JRadioButton();
+        jRadioButton6 = new javax.swing.JRadioButton();
+        labelCured = new javax.swing.JLabel();
         panelForm = new javax.swing.JPanel();
         labelTypeOfId = new javax.swing.JLabel();
         dayDropDown = new javax.swing.JComboBox<>();
@@ -196,6 +221,8 @@ public class RegisterForm extends javax.swing.JFrame {
         jLabel11 = new javax.swing.JLabel();
         wardNumberSpinner = new javax.swing.JSpinner();
         idTextField = new javax.swing.JFormattedTextField();
+        cureGroup = new javax.swing.ButtonGroup();
+        weeksGroup = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         backButton = new javax.swing.JButton();
         nextButton = new javax.swing.JButton();
@@ -242,6 +269,103 @@ public class RegisterForm extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jRadioButton4)
                 .addContainerGap(117, Short.MAX_VALUE))
+        );
+
+        panelCovid.setMinimumSize(new java.awt.Dimension(600, 300));
+        panelCovid.setPreferredSize(new java.awt.Dimension(600, 300));
+
+        jLabel12.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jLabel12.setText("Were you previously sick with Covid-19?");
+
+        cureGroup.add(jRadioButton1);
+        jRadioButton1.setText("Yes");
+        jRadioButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton1ActionPerformed(evt);
+            }
+        });
+
+        cureGroup.add(jRadioButton2);
+        jRadioButton2.setText("No");
+        jRadioButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton2ActionPerformed(evt);
+            }
+        });
+
+        jLabel6.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel6.setText("Has it atleast been 2 weeks since you got sick and were cured?");
+
+        weeksGroup.add(jRadioButton5);
+        jRadioButton5.setText("No");
+        jRadioButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton5ActionPerformed(evt);
+            }
+        });
+
+        weeksGroup.add(jRadioButton6);
+        jRadioButton6.setText("Yes");
+        jRadioButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton6ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout panelCureLayout = new javax.swing.GroupLayout(panelCure);
+        panelCure.setLayout(panelCureLayout);
+        panelCureLayout.setHorizontalGroup(
+            panelCureLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelCureLayout.createSequentialGroup()
+                .addGroup(panelCureLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jRadioButton5)
+                    .addComponent(jRadioButton6)
+                    .addComponent(jLabel6))
+                .addGap(0, 150, Short.MAX_VALUE))
+        );
+        panelCureLayout.setVerticalGroup(
+            panelCureLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelCureLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel6)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jRadioButton6)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jRadioButton5)
+                .addContainerGap(48, Short.MAX_VALUE))
+        );
+
+        labelCured.setForeground(new java.awt.Color(245, 0, 0));
+        labelCured.setText("If you are still sick from Covid-19, you cannot apply for the vaccine yet. Please get cured first.");
+
+        javax.swing.GroupLayout panelCovidLayout = new javax.swing.GroupLayout(panelCovid);
+        panelCovid.setLayout(panelCovidLayout);
+        panelCovidLayout.setHorizontalGroup(
+            panelCovidLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelCovidLayout.createSequentialGroup()
+                .addGap(17, 17, 17)
+                .addGroup(panelCovidLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(labelCured)
+                    .addComponent(jRadioButton2)
+                    .addComponent(jRadioButton1)
+                    .addComponent(jLabel12)
+                    .addComponent(panelCure, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(51, Short.MAX_VALUE))
+        );
+        panelCovidLayout.setVerticalGroup(
+            panelCovidLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelCovidLayout.createSequentialGroup()
+                .addGap(15, 15, 15)
+                .addComponent(jLabel12)
+                .addGap(18, 18, 18)
+                .addComponent(jRadioButton1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jRadioButton2)
+                .addGap(18, 18, 18)
+                .addComponent(panelCure, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(labelCured)
+                .addContainerGap(18, Short.MAX_VALUE))
         );
 
         panelForm.setMinimumSize(new java.awt.Dimension(600, 300));
@@ -375,7 +499,6 @@ public class RegisterForm extends javax.swing.JFrame {
         setTitle("Registration");
         setIconImage((new ImageIcon("resources/UI/syringe.png")).getImage());
         setMinimumSize(new java.awt.Dimension(600, 400));
-        setPreferredSize(new java.awt.Dimension(600, 400));
         setResizable(false);
 
         jPanel1.setBackground(new java.awt.Color(46, 48, 50));
@@ -465,73 +588,109 @@ public class RegisterForm extends javax.swing.JFrame {
         dispose();
     }//GEN-LAST:event_mainMenuButtonActionPerformed
 
+    int cure = 0;
+    String cureDate = "";
+
     private void nextButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextButtonActionPerformed
         // TODO add your handling code here:
 
         //NEXT BUTTON
-        if (idGroup.getSelection() != null && state == 0) {
+        if (idGroup.getSelection() != null) {
             if (idGroup.getSelection().getActionCommand().endsWith("D")) {
                 labelTypeOfId.setText("National Identifier (NID)");
             } else {
                 labelTypeOfId.setText("Birth Certificate Number");
             }
-            attachPanel(panelForm);
+            
+            attachPanel(panelStackFront.pop(), true);
             backButton.setEnabled(true);
-            nextButton.setText("Register");
-            state++;
-        } else {
+        } 
+        
+        if (cureGroup.getSelection() != null) {
+            if (cureGroup.getSelection().getActionCommand().equals("YES")) {
+                //YES COVID GOT ME
+                cure = 1;
+                if (weeksGroup.getSelection() != null) {
+                    if (weeksGroup.getSelection().getActionCommand().equals("YES")) {
+                        attachPanel(panelStackFront.pop(), true);
+                    }
+                }
+            } else {
+                //NO IM OK
+                cure = 0;
+                attachPanel(panelStackFront.pop(), true);
+            }
 
         }
-        
-        if (nextButton.getText().equals("Register") && isEmpty(phoneNumberTextField, idTextField)){
+
+        if (nextButton.getText().equals("Register") && isEmpty(phoneNumberTextField, idTextField)) {
             registerUser(idGroup.getSelection().getActionCommand());
         }
+
     }//GEN-LAST:event_nextButtonActionPerformed
 
-    
-    private void registerUser(String str){
+    private void registerUser(String str) {
         try {
             DBConnection.makeQuery("INSERT INTO " + str + " "
-                                    + "VALUES ('" + idTextField.getText()+ "',"
-                                    + "'" + parseDate() + "',"
-                                    + "'" + phoneNumberTextField.getText() + "',"
-                                    + "'" + cityDropDown.getSelectedItem().toString() + "',"
-                                    + "'" + locationDropDown.getSelectedItem().toString() + "',"
-                                    + "'" + wardNumberSpinner.getValue() +"'," 
-                                    + "'" + ageLabel.getText().split(" ")[2] + "')");
-           
+                    + "VALUES ('" + idTextField.getText() + "',"
+                    + "'" + parseDate(0) + "',"
+                    + "'" + phoneNumberTextField.getText() + "',"
+                    + "'" + cityDropDown.getSelectedItem().toString() + "',"
+                    + "'" + locationDropDown.getSelectedItem().toString() + "',"
+                    + "'" + wardNumberSpinner.getValue() + "',"
+                    + "'" + ageLabel.getText().split(" ")[2] + "')");
+
         } catch (SQLException ex) {
-            if (ex.getErrorCode() == 0){
+            if (ex.getErrorCode() == 0) {
                 JOptionPane.showMessageDialog(this, "Registration Successful!");
                 new MainMenu().setVisible(true);
                 dispose();
-            } else 
+            } else {
                 System.out.println(ex.getMessage());
+            }
         }
     }
-    
-    private String parseDate(){
+
+    private String parseDate(int i) {
         return yearDropDown.getSelectedItem().toString() + "-" + monthDropDown.getSelectedItem().toString() + "-" + dayDropDown.getSelectedItem().toString();
     }
-    
-    private boolean isEmpty(JTextField ...textFields){
+
+    private boolean isEmpty(JTextField... textFields) {
         for (int i = 0; i < textFields.length; i++) {
-            if (textFields[i].getText().equals(""))
+            if (textFields[i].getText().equals("")) {
                 return false;
+            }
         }
         return true;
     }
-    
+
     private void backButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backButtonActionPerformed
         // TODO add your handling code here:
         //BACK BUTTON
-        if (state == 1) {
-            attachPanel(panelWelcome);
-            nextButton.setText("Next ⯈");
-            backButton.setEnabled(false);
-        }
-        state--;
+        attachPanel(panelStackBack.pop(), false);
     }//GEN-LAST:event_backButtonActionPerformed
+
+    private void jRadioButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton1ActionPerformed
+        // TODO add your handling code here:
+        panelCure.setVisible(true);
+    }//GEN-LAST:event_jRadioButton1ActionPerformed
+
+    private void jRadioButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton2ActionPerformed
+        // TODO add your handling code here:
+        panelCure.setVisible(false);
+    }//GEN-LAST:event_jRadioButton2ActionPerformed
+
+    private void jRadioButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton5ActionPerformed
+        labelCured.setVisible(true);
+        nextButton.setEnabled(false);
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jRadioButton5ActionPerformed
+
+    private void jRadioButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton6ActionPerformed
+        labelCured.setVisible(false);
+        nextButton.setEnabled(true);
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jRadioButton6ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -547,31 +706,42 @@ public class RegisterForm extends javax.swing.JFrame {
     private javax.swing.JButton backButton;
     private javax.swing.JComboBox<String> cityDropDown;
     private javax.swing.JPanel container;
+    private javax.swing.ButtonGroup cureGroup;
     private javax.swing.JComboBox<String> dayDropDown;
     private javax.swing.ButtonGroup idGroup;
     private javax.swing.JFormattedTextField idTextField;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JRadioButton jRadioButton1;
+    private javax.swing.JRadioButton jRadioButton2;
     private javax.swing.JRadioButton jRadioButton3;
     private javax.swing.JRadioButton jRadioButton4;
+    private javax.swing.JRadioButton jRadioButton5;
+    private javax.swing.JRadioButton jRadioButton6;
+    private javax.swing.JLabel labelCured;
     private javax.swing.JLabel labelTypeOfId;
     private javax.swing.JComboBox<String> locationDropDown;
     private javax.swing.JButton mainMenuButton;
     private javax.swing.JComboBox<String> monthDropDown;
     private javax.swing.JButton nextButton;
+    private javax.swing.JPanel panelCovid;
+    private javax.swing.JPanel panelCure;
     private javax.swing.JPanel panelForm;
     private javax.swing.JPanel panelWelcome;
     private javax.swing.JTextField phoneNumberTextField;
     private javax.swing.JSpinner wardNumberSpinner;
+    private javax.swing.ButtonGroup weeksGroup;
     private javax.swing.JComboBox<String> yearDropDown;
     // End of variables declaration//GEN-END:variables
 
