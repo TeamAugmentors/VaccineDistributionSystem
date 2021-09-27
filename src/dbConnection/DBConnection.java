@@ -34,9 +34,9 @@ public class DBConnection {
             String password = null;
             
 //            <============MD. ATIKUR RAHMAN============>
-//            password = "123456";
-//            user = "Atiqur";
-//            url = "jdbc:sqlserver://localhost\\SQLExpress:1433;databaseName=VaccinationCenter";
+            password = "123456";
+            user = "Atiqur";
+            url = "jdbc:sqlserver://localhost\\SQLExpress:1433;databaseName=VaccinationCenter";
 //            <--------------- Ahmed Saad Tanim ------------->
 //            password = "123456";
 //            user = "AST";
