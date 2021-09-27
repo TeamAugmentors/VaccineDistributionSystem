@@ -38,9 +38,9 @@ public class DBConnection {
 //            user = "Atiqur";
 //            url = "jdbc:sqlserver://localhost\\SQLExpress:1433;databaseName=VaccinationCenter";
 //            <--------------- Ahmed Saad Tanim ------------->
-//            password = "123456";
-//            user = "AST";
-//            url = "jdbc:sqlserver://AST-PC\\SQLEXPRESS:1433;databaseName=VaccinationCenter";
+            password = "123456";
+            user = "AST";
+            url = "jdbc:sqlserver://AST-PC\\SQLEXPRESS:1433;databaseName=VaccinationCenter";
 //            <--------------- Sanjid Islam Chowdhury ----------->
 //            password = "123456";
 //            user = "san2";
