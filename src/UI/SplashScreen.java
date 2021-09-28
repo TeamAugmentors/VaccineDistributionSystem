@@ -24,7 +24,7 @@ public class SplashScreen extends javax.swing.JFrame {
         FlatDarkLaf.setup();
         initComponents();
 
-        Timer timer = new Timer(1500, (ActionEvent e) -> {
+        Timer timer = new Timer(6500, (ActionEvent e) -> {
             new MainMenu().setVisible(true);
             dispose();
         });

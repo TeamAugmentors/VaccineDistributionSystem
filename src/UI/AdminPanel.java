@@ -1008,19 +1008,28 @@ public class AdminPanel extends javax.swing.JFrame {
 
         int colCount = resultTable.getColumnCount();
         JTextField[] fields = new JTextField[colCount];
+        String[] labels = new String[colCount];
 
-        Object[] message = new Object[colCount * 2];
-        for (int i = 0, j = 0; i < message.length - 1; i += 2, j++) {
-            message[i] = tableColumnMap.get(boxTables.getSelectedItem().toString()).get(j);
-
+        Object[] objects = new Object[colCount * 2];
+        for (int i = 0, j = 0; i < objects.length - 1; i += 2, j++) {
+            labels[j] = tableColumnMap.get(boxTables.getSelectedItem().toString()).get(j);
+            objects[i] = labels[j];
             try {
                 if (currentResultSet.getMetaData().isAutoIncrement(j + 1)) {
                     fields[j] = new JTextField("AUTO INCREMENTED PRIMARY KEY");
                     fields[j].setEnabled(false);
-                    message[i + 1] = fields[j];
+
+                    objects[i + 1] = fields[j];
+
+                } else if (currentResultSet.getMetaData().isNullable(j + 1) == 1) {
+                    //NULLABLE
+                    fields[j] = new JTextField();
+                    objects[i] += " @NULLABLE";
+                    labels[j] += " @NULLABLE";
+                    objects[i + 1] = fields[j];
                 } else {
                     fields[j] = new JTextField();
-                    message[i + 1] = fields[j];
+                    objects[i + 1] = fields[j];
                 }
             } catch (SQLException ex) {
                 System.out.println(ex);
@@ -1028,21 +1037,29 @@ public class AdminPanel extends javax.swing.JFrame {
 
         }
 
-        int option = JOptionPane.showConfirmDialog(null, message, "Insert", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        int option = JOptionPane.showConfirmDialog(null, objects, "Insert", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
-        if (option == JOptionPane.OK_OPTION && isNotEmpty(fields)) {
+        if (option == JOptionPane.OK_OPTION) {
 
-            String insertQuery = "INSERT INTO " + table
-                    + " VALUES (";
+            String insertQuery = "INSERT INTO " + table + " (";
+
+            for (int i = 0; i < labels.length; i++) {
+                if (!fields[i].getText().equals("")) {
+                    insertQuery += labels[i].split(" ")[0] + ",";
+                }
+            }
+
+            insertQuery = String.copyValueOf(insertQuery.toCharArray(), 0, insertQuery.length() - 1);
+            insertQuery += ") VALUES (";
 
             for (int i = 0; i < fields.length; i++) {
-                if (fields[i].isEnabled()) {
-                    if (i == fields.length - 1) {
-                        insertQuery += "'" + fields[i].getText() + "'";
-                    } else {
-                        insertQuery += "'" + fields[i].getText() + "',";
-                    }
+                if (fields[i].isEnabled() && !"".equals(fields[i].getText())) {
+                    insertQuery += "'" + fields[i].getText() + "',";
                 }
+            }
+
+            if (insertQuery.charAt(insertQuery.length() - 1) == ',') {
+                insertQuery = String.copyValueOf(insertQuery.toCharArray(), 0, insertQuery.length() - 1);
             }
 
             insertQuery += ")";
@@ -1139,44 +1156,53 @@ public class AdminPanel extends javax.swing.JFrame {
 
     private void buttonDeleteRowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonDeleteRowActionPerformed
         // TODO add your handling code here:
-        String table = boxTables.getSelectedItem().toString();
-        int columnCount = resultTable.getColumnCount();
-        String[] colName = new String[columnCount];
-        String[] data = new String[columnCount];
-        String deleteQuery = "DELETE FROM " + table + " WHERE ";
-        int j = 0;
-        for (int i = 0; i < columnCount; i++) {
+
+        try {
+            String table = boxTables.getSelectedItem().toString();
+            int columnCount = resultTable.getColumnCount();
+            String[] colName = new String[columnCount];
+            String[] data = new String[columnCount];
+            String deleteQuery = "DELETE FROM " + table + " WHERE ";
+            int j = 0;
+
+            for (int i = 0; i < columnCount; i++) {
 //            if (i < resultTable.getColumnCount() - 1) {               
 //                    deleteQuery += tableColumnMap.get(table).get(i) + "='" + resultTable.getModel().getValueAt(resultTable.getSelectedRow(), i) + "'";               
 //            } else {
 //                    deleteQuery += tableColumnMap.get(table).get(i) + "='" + resultTable.getModel().getValueAt(resultTable.getSelectedRow(), i) + "' AND ";              
 //            }
-            if (resultTable.getModel().getValueAt(resultTable.getSelectedRow(), i) != null) {
-                colName[j] = tableColumnMap.get(table).get(i);
-                data[j] = resultTable.getModel().getValueAt(resultTable.getSelectedRow(), i).toString();
-                j++;
+                if (resultTable.getModel().getValueAt(resultTable.getSelectedRow(), i) != null) {
+                    colName[j] = tableColumnMap.get(table).get(i);
+                    data[j] = resultTable.getModel().getValueAt(resultTable.getSelectedRow(), i).toString();
+                    j++;
+                }
             }
-        }
-        for (int i = 0; i < j; i++) {
-            if (i < j - 1) {
-                deleteQuery += colName[i] + "='" + data[i] + "' AND ";
-            } else {
-                deleteQuery += colName[i] + "='" + data[i] + "'";
-            }
-        }
-        System.out.println(deleteQuery);
-        try {
-            DBConnection.makeQuery(deleteQuery);
 
-        } catch (SQLException e) {
-            if (e.getErrorCode() != 0) {
-                JOptionPane.showMessageDialog(this, "Error! " + e.getMessage() + "--->" + deleteQuery);
-            } else {
-                JOptionPane.showMessageDialog(this, "Successfully deleted!");
-
-                refresh();
+            for (int i = 0; i < j; i++) {
+                if (i < j - 1) {
+                    deleteQuery += colName[i] + "='" + data[i] + "' AND ";
+                } else {
+                    deleteQuery += colName[i] + "='" + data[i] + "'";
+                }
             }
+
+            System.out.println(deleteQuery);
+            try {
+                DBConnection.makeQuery(deleteQuery);
+
+            } catch (SQLException e) {
+                if (e.getErrorCode() != 0) {
+                    JOptionPane.showMessageDialog(this, "Error! " + e.getMessage() + "--->" + deleteQuery);
+                } else {
+                    JOptionPane.showMessageDialog(this, "Successfully deleted!");
+
+                    refresh();
+                }
+            }
+        } catch (Exception e) {
+            
         }
+
     }//GEN-LAST:event_buttonDeleteRowActionPerformed
 
     /**
