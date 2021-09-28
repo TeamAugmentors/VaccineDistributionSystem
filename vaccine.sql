@@ -143,8 +143,8 @@ select * from ADMIN_PANEL
 SELECT p.Identifier, p.Age, p.City, p.Area, v.First_Dose_Date, v.Second_Dose_Date
 FROM VACCINE v JOIN (SELECT Birth_Registration_Number AS 'Identifier' , Birth_Date, Mobile_Number, City, Area, Ward_Number, Age  FROM PERSON_BIRTH_C UNION
 					 SELECT NID AS 'Identifier', Birth_Date, Mobile_Number, City, Area, Ward_Number, Age FROM PERSON_NID) p
-ON (v.Identifier = p.Identifier)
-order by p.Age desc, v.First_Dose_Date asc
+ON (v.Identifier = p.Identifier) 
+order by p.Age desc, v.First_Dose_Date asc 
 
 (SELECT center_id FROM VACCINATION_CENTER
 WHERE City = ( (SELECT City FROM PERSON_BIRTH_C UNION
