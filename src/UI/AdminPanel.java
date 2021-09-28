@@ -28,12 +28,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EventObject;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
 /**
@@ -48,20 +55,32 @@ public class AdminPanel extends javax.swing.JFrame {
     //
     JLabel[] labels;
     JPanel[] panels;
-    String[] columnNames;
+    ArrayList<String> columnNames;
+
     Object[][] objects;
     JFrame bigTableFrame = null;
+
     HashMap<JLabel, JPanel> map = new HashMap<>();
-    HashMap<String, String[]> tableColumnMap = new HashMap<>();
+
+    HashMap<String, ArrayList<String>> tableColumnMap = new HashMap<>();
 
     JCheckBox checkBoxArr[];
     String name = "";
+
+    ResultSet currentResultSet;
 
     private void init() {
 
         //Make set
         makeLabels(labelHome, labelDashboard, labelDatabase, labelSql);
         makePanels(panelHome, panelDashboard, panelDatabase, panelSql);
+
+        //table stuff
+        resultTable.getModel().addTableModelListener(new TableModelListener() {
+            public void tableChanged(TableModelEvent e) {
+                // your code goes here, whatever you want to do when something changes in the table
+            }
+        });
 
         for (int i = 0; i < labels.length; i++) {
             map.put(labels[i], panels[i]);
@@ -70,39 +89,7 @@ public class AdminPanel extends javax.swing.JFrame {
         //Get name and id
         labelClientId.setText("Connection secure. Client ID: " + DBConnection.clientId);
         labelName.setText("Logged in as " + name);
-        try {
-            //populate tables
-
-            DatabaseMetaData metaData = DBConnection.getGlobalConnection().getMetaData();
-
-            String[] types = {"TABLE"};
-            ResultSet tables = metaData.getTables(null, null, "%", types);
-
-            while (tables.next()) {
-                if (!(tables.getString("TABLE_NAME").charAt(0) >= 'a')) {
-                    boxTables.addItem(tables.getString("TABLE_NAME"));
-                    ResultSet set = DBConnection.makeQuery("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = N'" + tables.getString("TABLE_NAME") + "'");
-
-
-                    ArrayList<String> str = new ArrayList<>();
-
-                    while (set.next()) {
-                        str.add(set.getString("COLUMN_NAME"));
-                    }
-
-                    String[] strArr = new String[str.size()];
-
-                    for (int i = 0; i < strArr.length; i++) {
-                        strArr[i] = str.get(i);
-                    }
-
-                    tableColumnMap.put(tables.getString("TABLE_NAME"), strArr);
-                }
-            }
-            generateColumnCheckboxes(tableColumnMap.get(boxTables.getItemAt(0)));
-        } catch (SQLException ex) {
-            System.out.println("ERROR " + ex.getMessage());
-        }
+        executeTableQuery();
 
         boxTables.addItemListener((e) -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
@@ -110,13 +97,41 @@ public class AdminPanel extends javax.swing.JFrame {
             }
         });
 
-
         System.out.println(boxTables.getItemCount());
 
     }
 
-    private void generateColumnCheckboxes(String[] colNames) {
-        int checkboxNum = colNames.length;
+    private void executeTableQuery() {
+        try {
+            //populate tables
+            DatabaseMetaData metaData = DBConnection.getGlobalConnection().getMetaData();
+
+            String[] types = {"TABLE"};
+            ResultSet tables = metaData.getTables(null, null, "%", types);
+            boxTables.removeAllItems();
+            while (tables.next()) {
+                if (!(tables.getString("TABLE_NAME").charAt(0) >= 'a')) {
+
+                    boxTables.addItem(tables.getString("TABLE_NAME"));
+                    ResultSet set = DBConnection.makeQuery("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = N'" + tables.getString("TABLE_NAME") + "'");
+
+                    ArrayList<String> str = new ArrayList<>();
+
+                    while (set.next()) {
+                        str.add(set.getString("COLUMN_NAME"));
+                    }
+
+                    tableColumnMap.put(tables.getString("TABLE_NAME"), str);
+                    generateColumnCheckboxes(tableColumnMap.get(boxTables.getSelectedItem().toString()));
+                }
+            }
+        } catch (SQLException ex) {
+            System.out.println("ERROR " + ex.getMessage());
+        }
+    }
+
+    private void generateColumnCheckboxes(ArrayList<String> colNames) {
+        int checkboxNum = colNames.size();
         int row = 1;
         int col = checkboxNum;
         if (checkboxNum > 6) {
@@ -131,7 +146,7 @@ public class AdminPanel extends javax.swing.JFrame {
         panelCheckbox.setLayout(experimentLayout);
         checkBoxArr = new JCheckBox[checkboxNum];
         for (int i = 0; i < checkboxNum; i++) {
-            JCheckBox checkBox = new JCheckBox(colNames[i], true);
+            JCheckBox checkBox = new JCheckBox(colNames.get(i), true);
             checkBox.setMinimumSize(checkBox.getPreferredSize());
             checkBoxArr[i] = checkBox;
             panelCheckbox.add(checkBox);
@@ -222,15 +237,15 @@ public class AdminPanel extends javax.swing.JFrame {
         whereTextField = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
         resultTable = new JTable(){
-            @Override
-            public boolean editCellAt(int row, int column, EventObject e) {
-                return false;//To change body of generated methods, choose Tools | Templates.
-            }
+
         };
         panelCheckbox = new javax.swing.JPanel();
         jButton2 = new javax.swing.JButton();
         buttonAddRow = new javax.swing.JButton();
         buttonAddColumn = new javax.swing.JButton();
+        buttonUpdate = new javax.swing.JButton();
+        buttonDeleteColumn = new javax.swing.JButton();
+        buttonDeleteRow = new javax.swing.JButton();
         panelSql = new javax.swing.JPanel();
         indices = new javax.swing.JPanel();
         labelHome = new javax.swing.JLabel();
@@ -535,9 +550,40 @@ public class AdminPanel extends javax.swing.JFrame {
             }
         });
 
-        buttonAddRow.setText("Add Row");
+        buttonAddRow.setText("+ Row");
+        buttonAddRow.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonAddRowActionPerformed(evt);
+            }
+        });
 
-        buttonAddColumn.setText("Add Column");
+        buttonAddColumn.setText("+ Column");
+        buttonAddColumn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonAddColumnActionPerformed(evt);
+            }
+        });
+
+        buttonUpdate.setText("Update");
+        buttonUpdate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonUpdateActionPerformed(evt);
+            }
+        });
+
+        buttonDeleteColumn.setText("- Column");
+        buttonDeleteColumn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonDeleteColumnActionPerformed(evt);
+            }
+        });
+
+        buttonDeleteRow.setText("- Row");
+        buttonDeleteRow.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonDeleteRowActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout panelDatabaseLayout = new javax.swing.GroupLayout(panelDatabase);
         panelDatabase.setLayout(panelDatabaseLayout);
@@ -551,11 +597,13 @@ public class AdminPanel extends javax.swing.JFrame {
                             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panelDatabaseLayout.createSequentialGroup()
                                 .addComponent(jLabel15)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(panelCheckbox, javax.swing.GroupLayout.DEFAULT_SIZE, 484, Short.MAX_VALUE))
+                                .addComponent(panelCheckbox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panelDatabaseLayout.createSequentialGroup()
                                 .addComponent(jLabel16)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(executeButton)
+                                .addGroup(panelDatabaseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(executeButton)
+                                    .addComponent(whereTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 471, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(0, 0, Short.MAX_VALUE)))
                         .addContainerGap())
                     .addGroup(panelDatabaseLayout.createSequentialGroup()
@@ -572,16 +620,20 @@ public class AdminPanel extends javax.swing.JFrame {
                                 .addComponent(jLabel13)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(topSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(panelDatabaseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                .addComponent(whereTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 471, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panelDatabaseLayout.createSequentialGroup()
+                            .addGroup(panelDatabaseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 517, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(buttonUpdate)
+                                .addGroup(panelDatabaseLayout.createSequentialGroup()
                                     .addComponent(buttonAddRow)
                                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(buttonDeleteRow)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(buttonAddColumn)
-                                    .addGap(301, 301, 301)
-                                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 517, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE))))
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(buttonDeleteColumn)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGap(0, 27, Short.MAX_VALUE))))
         );
         panelDatabaseLayout.setVerticalGroup(
             panelDatabaseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -617,10 +669,14 @@ public class AdminPanel extends javax.swing.JFrame {
                     .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(panelDatabaseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(buttonAddRow)
-                        .addComponent(buttonAddColumn)))
+                        .addComponent(buttonAddColumn)
+                        .addComponent(buttonDeleteColumn)
+                        .addComponent(buttonDeleteRow)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 320, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(61, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 297, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(buttonUpdate)
+                .addContainerGap(50, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout panelSqlLayout = new javax.swing.GroupLayout(panelSql);
@@ -813,30 +869,37 @@ public class AdminPanel extends javax.swing.JFrame {
         try {
             ResultSet set = DBConnection.makeQuery(query);
             ResultSet set2 = DBConnection.makeQuery(query);
+
             int rowCount = set2.getRow();
             while (set2.next()) {
                 rowCount++;
             }
+
             int colCount = set.getMetaData().getColumnCount();
-            columnNames = new String[colCount];
+
+            columnNames = new ArrayList<>();
 
             for (int i = 1; i <= colCount; i++) {
-                columnNames[i - 1] = set.getMetaData().getColumnName(i);
+                columnNames.add(set.getMetaData().getColumnName(i));
+                if (set.getMetaData().isAutoIncrement(i)) {
+
+                }
             }
 
             makeColumn(resultTable, columnNames);
+
             objects = new Object[rowCount][colCount];
 
             int k = 0;
             while (set.next()) {
+
                 //ADD INTO ROWS
                 objects[k] = new Object[colCount];
                 for (int i = 0; i < colCount; i++) {
-                    objects[k][i] = set.getString(columnNames[i]);
+                    objects[k][i] = set.getString(columnNames.get(i));
                 }
 
-                DefaultTableModel model = (DefaultTableModel) resultTable.getModel();
-                model.addRow(objects[k]);
+                getDefaultTableModel(resultTable).addRow(objects[k]);
                 k++;
 
             }
@@ -850,16 +913,18 @@ public class AdminPanel extends javax.swing.JFrame {
                 resultTable.getColumnModel().getColumn(columnIndex).setCellRenderer(rightRenderer);
             }
 
+            currentResultSet = set;
+
         } catch (SQLException ex) {
-            System.out.println(ex);
+            ex.printStackTrace();
         }
     }//GEN-LAST:event_executeButtonActionPerformed
 
-    void makeColumn(JTable table, String[] string) {
+    void makeColumn(JTable table, ArrayList<String> string) {
 
         DefaultTableModel tableModel = new DefaultTableModel();
-        for (int i = 0; i < string.length; i++) {
-            tableModel.addColumn(string[i]);
+        for (int i = 0; i < string.size(); i++) {
+            tableModel.addColumn(string.get(i));
         }
 
         table.setModel(tableModel);
@@ -880,7 +945,7 @@ public class AdminPanel extends javax.swing.JFrame {
             jFrame.addWindowListener(new WindowAdapter() {
                 @Override
                 public void windowClosing(WindowEvent e) {
-             
+
                     bigTableFrame = null;
                     e.getWindow().dispose();
                 }
@@ -899,8 +964,7 @@ public class AdminPanel extends javax.swing.JFrame {
             makeColumn(newTable, columnNames);
 
             for (Object[] object : objects) {
-                DefaultTableModel model = (DefaultTableModel) newTable.getModel();
-                model.addRow(object);
+                getDefaultTableModel(newTable).addRow(object);
             }
 
             DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
@@ -931,7 +995,173 @@ public class AdminPanel extends javax.swing.JFrame {
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         // TODO add your handling code here:
+
     }//GEN-LAST:event_jButton4ActionPerformed
+
+    DefaultTableModel getDefaultTableModel(JTable table) {
+        return (DefaultTableModel) table.getModel();
+    }
+
+    private void buttonAddRowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonAddRowActionPerformed
+        // TODO add your handling code here:.
+        String table = boxTables.getSelectedItem().toString();
+
+        int colCount = resultTable.getColumnCount();
+        JTextField[] fields = new JTextField[colCount];
+
+        Object[] message = new Object[colCount * 2];
+        for (int i = 0, j = 0; i < message.length - 1; i += 2, j++) {
+            message[i] = tableColumnMap.get(boxTables.getSelectedItem().toString()).get(j);
+
+            try {
+                if (currentResultSet.getMetaData().isAutoIncrement(j + 1)) {
+                    fields[j] = new JTextField("AUTO INCREMENTED PRIMARY KEY");
+                    fields[j].setEnabled(false);
+                    message[i + 1] = fields[j];
+                } else {
+                    fields[j] = new JTextField();
+                    message[i + 1] = fields[j];
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex);
+            }
+
+        }
+
+        int option = JOptionPane.showConfirmDialog(null, message, "Insert", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if (option == JOptionPane.OK_OPTION && isNotEmpty(fields)) {
+
+            String insertQuery = "INSERT INTO " + table
+                    + " VALUES (";
+
+            for (int i = 0; i < fields.length; i++) {
+                if (fields[i].isEnabled()) {
+                    if (i == fields.length - 1) {
+                        insertQuery += "'" + fields[i].getText() + "'";
+                    } else {
+                        insertQuery += "'" + fields[i].getText() + "',";
+                    }
+                }
+            }
+
+            insertQuery += ")";
+
+            try {
+                System.out.println(insertQuery);
+                DBConnection.makeQuery(insertQuery);
+            } catch (SQLException ex) {
+                if (ex.getErrorCode() != 0) {
+                    JOptionPane.showMessageDialog(this, "Error! " + ex.getMessage());
+                } else {
+                    JOptionPane.showMessageDialog(this, "Successfully added!");
+                    refresh();
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Please insert all fields!");
+        }
+    }//GEN-LAST:event_buttonAddRowActionPerformed
+
+    private boolean isNotEmpty(JTextField... textFields) {
+        for (int i = 0; i < textFields.length; i++) {
+            if (textFields[i].getText().equals("")) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void buttonAddColumnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonAddColumnActionPerformed
+        // TODO add your handling code here:
+        String table = boxTables.getSelectedItem().toString();
+        String input = JOptionPane.showInputDialog(this, "Enter Column Name and type\nSeperated by a comma ','");
+
+        try {
+            if (input.split(",").length == 2) {
+                String colName = input.split(",")[0];
+                String type = input.split(",")[1];
+
+                String updateQuery = "ALTER TABLE " + table + " ADD " + colName + " " + type;
+
+                try {
+                    DBConnection.makeQuery(updateQuery);
+
+                } catch (SQLException e) {
+                    if (e.getErrorCode() != 0) {
+                        JOptionPane.showMessageDialog(this, "Error! " + e.getMessage());
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Successfully added!");
+
+                        refresh();
+                    }
+                }
+
+            } else {
+                JOptionPane.showMessageDialog(this, "Invalid input!");
+            }
+        } catch (Exception e) {
+
+        }
+    }//GEN-LAST:event_buttonAddColumnActionPerformed
+
+    private void refresh() {
+        String item = boxTables.getSelectedItem().toString();
+        executeTableQuery();
+        boxTables.setSelectedItem(item);
+        executeButtonActionPerformed(null);
+    }
+
+    private void buttonUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonUpdateActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_buttonUpdateActionPerformed
+
+    private void buttonDeleteColumnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonDeleteColumnActionPerformed
+        // TODO add your handling code here:
+        String table = boxTables.getSelectedItem().toString();
+        String input = JOptionPane.showInputDialog(this, "Enter Column Name\n(Case Sensitive)");
+
+        String updateQuery = "ALTER TABLE " + table + " DROP COLUMN " + input;
+
+        try {
+            DBConnection.makeQuery(updateQuery);
+
+        } catch (SQLException e) {
+            if (e.getErrorCode() != 0) {
+                JOptionPane.showMessageDialog(this, "Error! " + e.getMessage());
+            } else {
+                JOptionPane.showMessageDialog(this, "Successfully deleted!");
+
+                refresh();
+            }
+        }
+    }//GEN-LAST:event_buttonDeleteColumnActionPerformed
+
+    private void buttonDeleteRowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonDeleteRowActionPerformed
+        // TODO add your handling code here:
+        String table = boxTables.getSelectedItem().toString();
+        String deleteQuery = "DELETE FROM " + table + " WHERE ";
+        for (int i = 0; i < resultTable.getColumnCount(); i++) {
+            if (i == resultTable.getColumnCount() - 1) {
+                deleteQuery += tableColumnMap.get(table).get(i) + "='" + resultTable.getModel().getValueAt(resultTable.getSelectedRow(), i) + "'";
+            } else {
+                deleteQuery += tableColumnMap.get(table).get(i) + "='" + resultTable.getModel().getValueAt(resultTable.getSelectedRow(), i) + "' AND ";
+            }
+        }
+
+        try {
+            DBConnection.makeQuery(deleteQuery);
+
+        } catch (SQLException e) {
+            if (e.getErrorCode() != 0) {
+                JOptionPane.showMessageDialog(this, "Error! " + e.getMessage());
+            } else {
+                JOptionPane.showMessageDialog(this, "Successfully deleted!");
+
+                refresh();
+            }
+        }
+    }//GEN-LAST:event_buttonDeleteRowActionPerformed
 
     /**
      * @param args the command line arguments
@@ -947,6 +1177,9 @@ public class AdminPanel extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> boxTables;
     private javax.swing.JButton buttonAddColumn;
     private javax.swing.JButton buttonAddRow;
+    private javax.swing.JButton buttonDeleteColumn;
+    private javax.swing.JButton buttonDeleteRow;
+    private javax.swing.JButton buttonUpdate;
     private javax.swing.JButton executeButton;
     private javax.swing.JLabel firstDoseNo;
     private javax.swing.JLabel firstDoseNo1;
