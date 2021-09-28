@@ -66,7 +66,7 @@ CREATE TABLE PERSON_BIRTH_C
 (
 Birth_Registration_Number VARCHAR(17) NOT NULL  PRIMARY KEY,
 Birth_Date DATE NOT NULL,
-Mobile_Number VARCHAR(11) UNIQUE NOT NULL,
+Mobile_Number VARCHAR(11) NOT NULL,
 City VARCHAR(45) NOT NULL,
 Area VARCHAR(45) NOT NULL,
 Ward_Number INT NOT NULL,
@@ -77,7 +77,7 @@ CREATE TABLE PERSON_NID
 (
 NID VARCHAR(10) NOT NULL PRIMARY KEY,
 Birth_Date DATE NOT NULL,
-Mobile_Number VARCHAR(11) UNIQUE NOT NULL,
+Mobile_Number VARCHAR(11) NOT NULL,
 City VARCHAR(45) NOT NULL,
 Area VARCHAR(45) NOT NULL,
 Ward_Number INT NOT NULL,
@@ -88,8 +88,7 @@ CREATE TABLE VACCINATION_CENTER (
 Center_ID INT NOT NULL PRIMARY KEY,
 Institute_Name VARCHAR(45) NOT NULL,
 Amount_Registered INT NOT NULL,
-City VARCHAR(45) NOT NULL,
-Area VARCHAR(45) NOT NULL,
+Center_Location VARCHAR(45) NOT NULL,
 Batch_Number INT NOT NULL
 );
 
@@ -107,27 +106,34 @@ IsExpired INT NOT NULL DEFAULT 0
 
 CREATE TABLE COVID_AFFECTED 
 (
-Identifier VARCHAR(17) NOT NULL PRIMARY KEY,
+NID VARCHAR(10) NOT NULL PRIMARY KEY,
 IsAffected INT NOT NULL,
-Age_Allowed_Vaccine INT NOT NULL CHECK (Age_Allowed_Vaccine >= 18)
+Cure_Date DATE NOT NULL,
+IsAllowed_Vaccine INT NOT NULL
 );
 
 CREATE TABLE VACCINE 
 (
-Identifier VARCHAR(17) UNIQUE,
+Registered_NID VARCHAR(10) NOT NULL PRIMARY KEY,
 First_Dose_Date DATE NULL,
 Second_Dose_Date DATE NULL
 );
+select * from VACCINE
+INSERT INTO VACCINE (Registered_NID, First_Dose_Date, Second_Dose_Date)
+VALUES('121434334', '2020-09-20', '2020-12-09');
 
-SELECT * FROM VACCINE
-INSERT INTO VACCINE (Identifier, First_Dose_Date, Second_Dose_Date)
-VALUES('121434334', '2020-09-20', '2020-12-09'),
-      ('1234', '2021-05-01', '2020-04-01');
 
+INSERT INTO VACCINE(Registered_NID, First_Dose_Date, Second_Dose_Date)
+values ('1234', '2021-05-01', '2020-04-01');
 
 INSERT INTO ADMIN_PANEL VALUES ('Sanjid', 'Chowdhury', 'Lassassin', '123456'),
-							   ('Atikur', 'Rahman', 'Atiq', '123456'),
-							   ('Tanim', 'Ahmed', 'A.S.T.', '123456')
+						 ('Tanim', 'Ahmed', 'AST.A.S.T.', '123456'),
+						 ('Atikur', 'Rahman', 'Atiq', '123456'),
+						 ('Tanim', 'Ahmed', 'A.S.T.', '123456'),
+						 ('Atikur', 'Rahman', 'Cyberman', '123456')
+
+INSERT INTO INFORMATION VALUES ('Dhaka'), 
+							   ('M')
 
 SELECT * FROM ADMIN_PANEL
 
@@ -138,14 +144,3 @@ ADD FOREIGN KEY (Batch_Number) REFERENCES STORAGE(Batch_Number);
 
 
 select * from ADMIN_PANEL
-
-
-SELECT p.Identifier, p.Age, p.City, p.Area, v.First_Dose_Date, v.Second_Dose_Date
-FROM VACCINE v JOIN (SELECT Birth_Registration_Number AS 'Identifier' , Birth_Date, Mobile_Number, City, Area, Ward_Number, Age  FROM PERSON_BIRTH_C UNION
-					 SELECT NID AS 'Identifier', Birth_Date, Mobile_Number, City, Area, Ward_Number, Age FROM PERSON_NID) p
-ON (v.Identifier = p.Identifier)
-order by p.Age desc, v.First_Dose_Date asc
-
-(SELECT center_id FROM VACCINATION_CENTER
-WHERE City = ( (SELECT City FROM PERSON_BIRTH_C UNION
-				SELECT City FROM PERSON_NID) INTERSECT SELECT city FROM VACCINATION_CENTER) )
