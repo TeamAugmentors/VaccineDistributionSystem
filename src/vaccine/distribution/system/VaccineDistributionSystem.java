@@ -5,7 +5,6 @@
  */
 package vaccine.distribution.system;
 
-import UI.Login;
 import UI.SplashScreen;
 import dbConnection.DBConnection;
 

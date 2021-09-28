@@ -42,9 +42,9 @@ public class DBConnection {
 //            user = "AST";
 //            url = "jdbc:sqlserver://AST-PC\\SQLEXPRESS:1433;databaseName=VaccinationCenter";
 //            <--------------- Sanjid Islam Chowdhury ----------->
-            password = "123456";
-            user = "san2";
-            url = "jdbc:sqlserver://lassassins-blad\\SQLEXPRESS:1433;databaseName=VaccinationCenter";
+//            password = "123456";
+//            user = "san2";
+//            url = "jdbc:sqlserver://lassassins-blad\\SQLEXPRESS:1433;databaseName=VaccinationCenter";
 
             connection = DriverManager.getConnection(url, user, password);
             clientId = connection.toString().substring(35, connection.toString().length());

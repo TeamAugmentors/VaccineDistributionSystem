@@ -1140,21 +1140,37 @@ public class AdminPanel extends javax.swing.JFrame {
     private void buttonDeleteRowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonDeleteRowActionPerformed
         // TODO add your handling code here:
         String table = boxTables.getSelectedItem().toString();
+        int columnCount = resultTable.getColumnCount();
+        String[] colName = new String[columnCount];
+        String[] data = new String[columnCount];
         String deleteQuery = "DELETE FROM " + table + " WHERE ";
-        for (int i = 0; i < resultTable.getColumnCount(); i++) {
-            if (i == resultTable.getColumnCount() - 1) {
-                deleteQuery += tableColumnMap.get(table).get(i) + "='" + resultTable.getModel().getValueAt(resultTable.getSelectedRow(), i) + "'";
-            } else {
-                deleteQuery += tableColumnMap.get(table).get(i) + "='" + resultTable.getModel().getValueAt(resultTable.getSelectedRow(), i) + "' AND ";
+        int j = 0;
+        for (int i = 0; i < columnCount; i++) {
+//            if (i < resultTable.getColumnCount() - 1) {               
+//                    deleteQuery += tableColumnMap.get(table).get(i) + "='" + resultTable.getModel().getValueAt(resultTable.getSelectedRow(), i) + "'";               
+//            } else {
+//                    deleteQuery += tableColumnMap.get(table).get(i) + "='" + resultTable.getModel().getValueAt(resultTable.getSelectedRow(), i) + "' AND ";              
+//            }
+            if (resultTable.getModel().getValueAt(resultTable.getSelectedRow(), i) != null) {
+                colName[j] = tableColumnMap.get(table).get(i);
+                data[j] = resultTable.getModel().getValueAt(resultTable.getSelectedRow(), i).toString();
+                j++;
             }
         }
-
+        for (int i = 0; i < j; i++) {
+            if (i < j - 1) {
+                deleteQuery += colName[i] + "='" + data[i] + "' AND ";
+            } else {
+                deleteQuery += colName[i] + "='" + data[i] + "'";
+            }
+        }
+        System.out.println(deleteQuery);
         try {
             DBConnection.makeQuery(deleteQuery);
 
         } catch (SQLException e) {
             if (e.getErrorCode() != 0) {
-                JOptionPane.showMessageDialog(this, "Error! " + e.getMessage());
+                JOptionPane.showMessageDialog(this, "Error! " + e.getMessage() + "--->" + deleteQuery);
             } else {
                 JOptionPane.showMessageDialog(this, "Successfully deleted!");
 
