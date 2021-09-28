@@ -13,6 +13,8 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Stack;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -28,7 +30,7 @@ public class RegisterForm extends javax.swing.JFrame {
 
     private JPanel panels[];
     private int state = -1;
-    
+
     String nextButtonText;
 
     private HashMap<String, String[]> cityAreaMap = new HashMap<>();
@@ -45,7 +47,7 @@ public class RegisterForm extends javax.swing.JFrame {
         nextButton.setEnabled(false);
 
         nextButtonText = nextButton.getText();
-        
+
         panels = getPanelsArray(panelWelcome, panelCovid, panelForm);
 
         jRadioButton3.setActionCommand("PERSON_NID");
@@ -633,55 +635,69 @@ public class RegisterForm extends javax.swing.JFrame {
     private void check() {
         backButton.setEnabled(true);
         nextButton.setEnabled(false);
-        
-        if (panels[state] == panelCovid){
-            if (cureGroup.getSelection() != null){
-                if (cureGroup.getSelection().getActionCommand().equals("NO")){
+
+        if (panels[state] == panelCovid) {
+            if (cureGroup.getSelection() != null) {
+                if (cureGroup.getSelection().getActionCommand().equals("NO")) {
                     nextButton.setEnabled(true);
                 } else {
-                    if (weeksGroup.getSelection() != null){
-                        if (weeksGroup.getSelection().getActionCommand().equals("YES")){
+                    if (weeksGroup.getSelection() != null) {
+                        if (weeksGroup.getSelection().getActionCommand().equals("YES")) {
                             nextButton.setEnabled(true);
                         }
                     }
                 }
             }
         }
-        
-        if (panels[state] == panelForm){
+
+        if (panels[state] == panelForm) {
             nextButton.setText("Register");
             nextButton.setEnabled(true);
-        }     
+        }
     }
-    
+
     private void registerUser(String str) {
         try {
             int isAffected;
-            
-            if (cureGroup.getSelection().getActionCommand().equals("NO")){
+
+            if (cureGroup.getSelection().getActionCommand().equals("NO")) {
                 isAffected = 0;
             } else {
                 isAffected = 1;
             }
+
+            String query = "INSERT INTO COVID_AFFECTED(Identifier, IsAffected, Age_Allowed_Vaccine) VALUES ('" + idTextField.getText() + "' ,"
+                    + "'" + isAffected + "',"
+                    + "'" + ageLabel.getText().split(" ")[2] + "')";
+
             
-            DBConnection.makeQuery("INSERT INTO " + str + " "
-                    + "VALUES ('" + idTextField.getText() + "',"
-                    + "'" + parseDate(0) + "',"
-                    + "'" + phoneNumberTextField.getText() + "',"
-                    + "'" + cityDropDown.getSelectedItem().toString() + "',"
-                    + "'" + locationDropDown.getSelectedItem().toString() + "',"
-                    + "'" + wardNumberSpinner.getValue() + "',"
-                    + "'" + ageLabel.getText().split(" ")[2] + "',"
-                    + "'" + isAffected + "')");
-           
+            DBConnection.makeQuery(query);
 
         } catch (SQLException ex) {
             if (ex.getErrorCode() == 0) {
-                JOptionPane.showMessageDialog(this, "Registration Successful!");
-                new MainMenu().setVisible(true);
-                dispose();
+
+                try {
+                    DBConnection.makeQuery("INSERT INTO " + str + " "
+                            + "VALUES ('" + idTextField.getText() + "',"
+                            + "'" + parseDate(0) + "',"
+                            + "'" + phoneNumberTextField.getText() + "',"
+                            + "'" + cityDropDown.getSelectedItem().toString() + "',"
+                            + "'" + locationDropDown.getSelectedItem().toString() + "',"
+                            + "'" + wardNumberSpinner.getValue() + "',"
+                            + "'" + ageLabel.getText().split(" ")[2] + "')");
+
+                } catch (SQLException ex1) {
+                    if (ex1.getErrorCode() == 0) {
+                        JOptionPane.showMessageDialog(this, "Registration Successful!");
+                        new MainMenu().setVisible(true);
+                        dispose();
+                    }
+                    else{
+                        System.out.println(ex.getMessage());
+                    }
+                }
             } else {
-                System.out.println(ex.getMessage());
+                JOptionPane.showMessageDialog(this, "Sorry you are not old enough for the vaccine");
             }
         }
     }
@@ -706,13 +722,13 @@ public class RegisterForm extends javax.swing.JFrame {
 
         if (panels[state] == panelWelcome) {
             backButton.setEnabled(false);
-            
-            if (idGroup.getSelection() != null){
+
+            if (idGroup.getSelection() != null) {
                 nextButton.setEnabled(true);
-                
+
             }
         }
-        
+
         nextButton.setText(nextButtonText);
     }//GEN-LAST:event_backButtonActionPerformed
 
@@ -720,9 +736,9 @@ public class RegisterForm extends javax.swing.JFrame {
         // TODO add your handling code here:
         panelCure.setVisible(true);
         nextButton.setEnabled(false);
-        
-        if(weeksGroup.getSelection()!=null){
-            if (weeksGroup.getSelection().getActionCommand().equals("NO")){
+
+        if (weeksGroup.getSelection() != null) {
+            if (weeksGroup.getSelection().getActionCommand().equals("NO")) {
                 labelCured.setVisible(true);
             } else {
                 nextButton.setEnabled(true);
@@ -766,7 +782,7 @@ public class RegisterForm extends javax.swing.JFrame {
      */
     public static void main(String args[]) {
         FlatDarkLaf.setup();
-        
+
         new DBConnection().getConnection();
         new RegisterForm().setVisible(true);
 
