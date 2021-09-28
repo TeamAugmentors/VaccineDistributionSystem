@@ -14,6 +14,10 @@ import java.awt.GridLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.net.URI;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -24,11 +28,13 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import java.sql.DatabaseMetaData;
+import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EventObject;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
@@ -38,6 +44,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
@@ -74,6 +81,8 @@ public class AdminPanel extends javax.swing.JFrame {
         //Make set
         makeLabels(labelHome, labelDashboard, labelDatabase, labelSql);
         makePanels(panelHome, panelDashboard, panelDatabase, panelSql);
+
+        panelEditorPane.setVisible(false);
 
         //table stuff
         resultTable.getModel().addTableModelListener(new TableModelListener() {
@@ -247,6 +256,18 @@ public class AdminPanel extends javax.swing.JFrame {
         buttonDeleteColumn = new javax.swing.JButton();
         buttonDeleteRow = new javax.swing.JButton();
         panelSql = new javax.swing.JPanel();
+        jLabel21 = new javax.swing.JLabel();
+        jTextField1 = new javax.swing.JTextField();
+        jButton3 = new javax.swing.JButton();
+        jLabel22 = new javax.swing.JLabel();
+        jLabel25 = new javax.swing.JLabel();
+        jLabel24 = new javax.swing.JLabel();
+        buttonUploadFile = new javax.swing.JButton();
+        panelEditorPane = new javax.swing.JPanel();
+        labelFileName = new javax.swing.JLabel();
+        buttonExecuteSelectedText = new javax.swing.JButton();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jEditorPane1 = new javax.swing.JEditorPane();
         indices = new javax.swing.JPanel();
         labelHome = new javax.swing.JLabel();
         labelDashboard = new javax.swing.JLabel();
@@ -679,16 +700,89 @@ public class AdminPanel extends javax.swing.JFrame {
                 .addContainerGap(50, Short.MAX_VALUE))
         );
 
-        javax.swing.GroupLayout panelSqlLayout = new javax.swing.GroupLayout(panelSql);
-        panelSql.setLayout(panelSqlLayout);
-        panelSqlLayout.setHorizontalGroup(
-            panelSqlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
+        panelSql.setMaximumSize(new java.awt.Dimension(550, 700));
+        panelSql.setMinimumSize(new java.awt.Dimension(550, 700));
+        panelSql.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLabel21.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        jLabel21.setText("Execute a Custom SQL Query");
+        panelSql.add(jLabel21, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 18, -1, -1));
+
+        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField1ActionPerformed(evt);
+            }
+        });
+        panelSql.add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 68, 538, -1));
+
+        jButton3.setText("Execute");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+        panelSql.add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 102, -1, -1));
+
+        jLabel22.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jLabel22.setText("OR");
+        panelSql.add(jLabel22, new org.netbeans.lib.awtextra.AbsoluteConstraints(267, 130, -1, -1));
+
+        jLabel25.setText("________________________________________________");
+        panelSql.add(jLabel25, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 130, -1, -1));
+
+        jLabel24.setText("________________________________________________");
+        panelSql.add(jLabel24, new org.netbeans.lib.awtextra.AbsoluteConstraints(304, 130, -1, -1));
+
+        buttonUploadFile.setText("Upload an .sql file");
+        buttonUploadFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonUploadFileActionPerformed(evt);
+            }
+        });
+        panelSql.add(buttonUploadFile, new org.netbeans.lib.awtextra.AbsoluteConstraints(218, 167, -1, -1));
+
+        panelEditorPane.setMaximumSize(new java.awt.Dimension(538, 479));
+        panelEditorPane.setMinimumSize(new java.awt.Dimension(538, 479));
+        panelEditorPane.setPreferredSize(new java.awt.Dimension(127, 479));
+
+        labelFileName.setText("jLabel23");
+
+        buttonExecuteSelectedText.setText("▶");
+        buttonExecuteSelectedText.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonExecuteSelectedTextActionPerformed(evt);
+            }
+        });
+
+        jScrollPane3.setViewportView(jEditorPane1);
+
+        javax.swing.GroupLayout panelEditorPaneLayout = new javax.swing.GroupLayout(panelEditorPane);
+        panelEditorPane.setLayout(panelEditorPaneLayout);
+        panelEditorPaneLayout.setHorizontalGroup(
+            panelEditorPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelEditorPaneLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panelEditorPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 528, Short.MAX_VALUE)
+                    .addGroup(panelEditorPaneLayout.createSequentialGroup()
+                        .addComponent(labelFileName)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(buttonExecuteSelectedText)))
+                .addContainerGap())
         );
-        panelSqlLayout.setVerticalGroup(
-            panelSqlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
+        panelEditorPaneLayout.setVerticalGroup(
+            panelEditorPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelEditorPaneLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panelEditorPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(labelFileName)
+                    .addComponent(buttonExecuteSelectedText))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 416, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(29, Short.MAX_VALUE))
         );
+
+        panelSql.add(panelEditorPane, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 195, 540, -1));
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Admin Panel");
@@ -817,6 +911,8 @@ public class AdminPanel extends javax.swing.JFrame {
 
         currentLabel.setBackground(ColorEx.MY_BLUE);
         currentLabel.setForeground(Color.WHITE);
+
+        refresh();
     }//GEN-LAST:event_labelMouseClicked
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -1200,10 +1296,152 @@ public class AdminPanel extends javax.swing.JFrame {
                 }
             }
         } catch (Exception e) {
-            
+            JOptionPane.showMessageDialog(this, e.getMessage());
         }
 
     }//GEN-LAST:event_buttonDeleteRowActionPerformed
+
+    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField1ActionPerformed
+
+    private void buttonUploadFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonUploadFileActionPerformed
+        // TODO add your handling code here:
+
+        JFileChooser chooser = new JFileChooser();
+        FileNameExtensionFilter filter = new FileNameExtensionFilter(
+                "sql", "SQL", "txt");
+        chooser.setFileFilter(filter);
+
+        if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            BufferedReader reader;
+            StringBuilder sb = new StringBuilder();
+            try {
+                reader = new BufferedReader(new FileReader(chooser.getSelectedFile()));
+                String line = reader.readLine();
+                while (line != null) {
+                    sb.append(line);
+                    sb.append(System.lineSeparator());
+                    line = reader.readLine();
+                }
+                jEditorPane1.setText(sb.toString());
+
+                panelEditorPane.setVisible(true);
+                labelFileName.setText(chooser.getSelectedFile().getName());
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, ex.getMessage());
+            }
+        }
+    }//GEN-LAST:event_buttonUploadFileActionPerformed
+
+    private void buttonExecuteSelectedTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonExecuteSelectedTextActionPerformed
+        // TODO add your handling code here:
+        boolean success = false;
+        if (!jEditorPane1.getSelectedText().trim().equals("")) {
+            try {
+                String query = jEditorPane1.getSelectedText().trim();
+                makeNewTableAndShow(query);
+
+            } catch (SQLException ex) {
+                if (ex.getErrorCode() == 0) {
+                    JOptionPane.showMessageDialog(this, "Query successful!");
+                    success = true;
+                } else {
+                    JOptionPane.showMessageDialog(this, "ERROR! " + ex.getMessage());
+                }
+            }
+        }
+
+
+    }//GEN-LAST:event_buttonExecuteSelectedTextActionPerformed
+
+    void makeNewTableAndShow(String query) throws SQLException {
+        ResultSet resultSet = DBConnection.makeQuery(query);
+        ResultSet rowCountingSet = DBConnection.makeQuery(query);
+        int rowCount = 0;
+        while (rowCountingSet.next()) {
+            rowCount++;
+        }
+
+        ResultSetMetaData metaData = resultSet.getMetaData();
+        ArrayList<String> columnNames = new ArrayList<>();
+        for (int i = 0; i < metaData.getColumnCount(); i++) {
+            columnNames.add(metaData.getColumnName(i + 1));
+        }
+
+        JFrame jFrame = new JFrame();
+
+        jFrame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+
+                bigTableFrame = null;
+                e.getWindow().dispose();
+            }
+        });
+
+        JPanel panel;
+
+        jFrame.add(panel = new JPanel(new GridLayout(1, 1)));
+
+        JTable newTable = new JTable() {
+            @Override
+            public boolean editCellAt(int row, int column, EventObject e) {
+                return false;//To change body of generated methods, choose Tools | Templates.
+            }
+        };
+
+        makeColumn(newTable, columnNames);
+
+        Object[][] objects = new Object[rowCount][columnNames.size()];
+
+        int k = 0;
+        while (resultSet.next()) {
+
+            //ADD INTO ROWS
+            objects[k] = new Object[columnNames.size()];
+            for (int i = 0; i < columnNames.size(); i++) {
+                objects[k][i] = resultSet.getString(columnNames.get(i));
+            }
+
+            getDefaultTableModel(newTable).addRow(objects[k]);
+            k++;
+
+        }
+
+        DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
+        rightRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+
+        TableModel tableModel = newTable.getModel();
+
+        for (int columnIndex = 0; columnIndex < tableModel.getColumnCount(); columnIndex++) {
+            newTable.getColumnModel().getColumn(columnIndex).setCellRenderer(rightRenderer);
+        }
+
+        panel.add(new JScrollPane(newTable));
+
+        jFrame.setResizable(true);
+        jFrame.setLocationRelativeTo(null);
+        jFrame.setIconImage(new ImageIcon("resources/UI/syringe.png").getImage());
+        jFrame.setTitle("Results Table");
+        jFrame.pack();
+        jFrame.setVisible(true);
+    }
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // TODO add your handling code here:
+        if (!jTextField1.getText().equals(""))
+        try {
+            makeNewTableAndShow(jTextField1.getText().trim());
+        } catch (SQLException ex) {
+            if (ex.getErrorCode() == 0) {
+                JOptionPane.showMessageDialog(this, "Query successful!");
+            } else {
+                JOptionPane.showMessageDialog(this, "ERROR! " + ex.getMessage());
+            }
+        }
+
+    }//GEN-LAST:event_jButton3ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1221,14 +1459,18 @@ public class AdminPanel extends javax.swing.JFrame {
     private javax.swing.JButton buttonAddRow;
     private javax.swing.JButton buttonDeleteColumn;
     private javax.swing.JButton buttonDeleteRow;
+    private javax.swing.JButton buttonExecuteSelectedText;
     private javax.swing.JButton buttonUpdate;
+    private javax.swing.JButton buttonUploadFile;
     private javax.swing.JButton executeButton;
     private javax.swing.JLabel firstDoseNo;
     private javax.swing.JLabel firstDoseNo1;
     private javax.swing.JPanel indices;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
+    private javax.swing.JEditorPane jEditorPane1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -1242,6 +1484,10 @@ public class AdminPanel extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel20;
+    private javax.swing.JLabel jLabel21;
+    private javax.swing.JLabel jLabel22;
+    private javax.swing.JLabel jLabel24;
+    private javax.swing.JLabel jLabel25;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -1251,12 +1497,15 @@ public class AdminPanel extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTable jTable1;
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextArea jTextArea2;
+    private javax.swing.JTextField jTextField1;
     private javax.swing.JLabel labelClientId;
     private javax.swing.JLabel labelDashboard;
     private javax.swing.JLabel labelDatabase;
+    private javax.swing.JLabel labelFileName;
     private javax.swing.JLabel labelHome;
     private javax.swing.JLabel labelName;
     private javax.swing.JLabel labelSql;
@@ -1264,6 +1513,7 @@ public class AdminPanel extends javax.swing.JFrame {
     private javax.swing.JPanel panelCheckbox;
     private javax.swing.JPanel panelDashboard;
     private javax.swing.JPanel panelDatabase;
+    private javax.swing.JPanel panelEditorPane;
     private javax.swing.JPanel panelHome;
     private javax.swing.JPanel panelSql;
     private javax.swing.JTable resultTable;
