@@ -103,7 +103,9 @@ public class AdminPanel extends javax.swing.JFrame {
 
         boxTables.addItemListener((e) -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
+                
                 generateColumnCheckboxes(tableColumnMap.get(e.getItem().toString()));
+                executeButtonActionPerformed(null);
             }
         });
 
@@ -395,6 +397,11 @@ public class AdminPanel extends javax.swing.JFrame {
         panelDashboard.setMaximumSize(new java.awt.Dimension(500, 598));
         panelDashboard.setMinimumSize(new java.awt.Dimension(500, 598));
         panelDashboard.setPreferredSize(new java.awt.Dimension(500, 598));
+        panelDashboard.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                panelDashboardMouseClicked(evt);
+            }
+        });
 
         jButton4.setFont(new java.awt.Font("Tahoma", 1, 20)); // NOI18N
         jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/UI/exit-top-right_1.png"))); // NOI18N
@@ -905,6 +912,9 @@ public class AdminPanel extends javax.swing.JFrame {
 
     private void none(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_none
         // TODO add your handling code here:
+        if(evt.getComponent() == labelDashboard){
+            addDashoardData();
+        }
         JLabel currentLabel = (JLabel) evt.getComponent();
         currentLabel.setOpaque(true);
 
@@ -1461,6 +1471,10 @@ public class AdminPanel extends javax.swing.JFrame {
         addDashoardData();
     }//GEN-LAST:event_jButton5ActionPerformed
 
+    private void panelDashboardMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_panelDashboardMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_panelDashboardMouseClicked
+
     
     private void addDashoardData() {
         try {
@@ -1469,10 +1483,7 @@ public class AdminPanel extends javax.swing.JFrame {
                     "FROM PERSON_BIRTH_C UNION SELECT NID AS 'Identifier', Birth_Date, Mobile_Number, City, Area, Ward_Number, Age FROM PERSON_NID) p " +
                     "ON (v.Identifier = p.Identifier) order by p.Age desc, v.First_Dose_Date asc";
             
-            System.out.println(query);
             ResultSet set = DBConnection.makeQuery(query);
-            
-            System.out.println(set.getRow());
             
             int colCount = set.getMetaData().getColumnCount();
             System.out.println(colCount);
@@ -1483,6 +1494,18 @@ public class AdminPanel extends javax.swing.JFrame {
             }
             
             makeColumn(jDashboardTable, dashboardColName);
+            
+            ArrayList<ArrayList<Object>> rows = new ArrayList<>();
+            
+            while(set.next()){
+                ArrayList<Object> temp = new ArrayList<>(); 
+                for(int i=1; i<=colCount; i++){
+                    temp.add(set.getString(dashboardColName.get(i-1)));
+                }
+                getDefaultTableModel(jDashboardTable).addRow(temp.toArray());
+            }
+            
+//            getDefaultTableModel(jDashboardTable).addRow(rows.toArray());
             
         } catch (SQLException ex) {
             System.out.println("Something wromg");

@@ -192,6 +192,9 @@
           <Dimension value="[500, 598]"/>
         </Property>
       </Properties>
+      <Events>
+        <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="panelDashboardMouseClicked"/>
+      </Events>
 
       <Layout>
         <DimensionLayout dim="0">
@@ -232,7 +235,7 @@
                           <Component id="jScrollPane2" min="-2" pref="462" max="-2" attributes="0"/>
                       </Group>
                   </Group>
-                  <EmptySpace pref="-4" max="32767" attributes="0"/>
+                  <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>

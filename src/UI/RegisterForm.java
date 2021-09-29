@@ -668,6 +668,7 @@ public class RegisterForm extends javax.swing.JFrame {
                     + "'" + isAffected + "',"
                     + "'" + ageLabel.getText().split(" ")[2] + "')";
 
+            
             DBConnection.makeQuery(query);
 
         } catch (SQLException ex) {
@@ -682,6 +683,11 @@ public class RegisterForm extends javax.swing.JFrame {
                             + "'" + locationDropDown.getSelectedItem().toString() + "',"
                             + "'" + wardNumberSpinner.getValue() + "',"
                             + "'" + ageLabel.getText().split(" ")[2] + "')");
+                    
+                    
+                    String queryVaccine = "INSERT INTO VACCINE(Identifier) VALUES ('" + idTextField.getText() + "')";
+                    
+                    DBConnection.makeQuery(queryVaccine);
 
                 } catch (SQLException ex1) {
                     if (ex1.getErrorCode() == 0) {
