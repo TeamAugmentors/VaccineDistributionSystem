@@ -63,6 +63,7 @@ public class AdminPanel extends javax.swing.JFrame {
     JLabel[] labels;
     JPanel[] panels;
     ArrayList<String> columnNames;
+    ArrayList<String> dashboardColName;
 
     Object[][] objects;
     JFrame bigTableFrame = null;
@@ -220,7 +221,7 @@ public class AdminPanel extends javax.swing.JFrame {
         panelDashboard = new javax.swing.JPanel();
         jButton4 = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        jDashboardTable = new javax.swing.JTable();
         jLabel3 = new javax.swing.JLabel();
         jLabel18 = new javax.swing.JLabel();
         vaccineLeft = new javax.swing.JLabel();
@@ -232,6 +233,7 @@ public class AdminPanel extends javax.swing.JFrame {
         firstDoseNo1 = new javax.swing.JLabel();
         jLabel19 = new javax.swing.JLabel();
         jLabel20 = new javax.swing.JLabel();
+        jButton5 = new javax.swing.JButton();
         panelDatabase = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         boxTables = new javax.swing.JComboBox<>();
@@ -403,7 +405,7 @@ public class AdminPanel extends javax.swing.JFrame {
             }
         });
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        jDashboardTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -414,7 +416,7 @@ public class AdminPanel extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane2.setViewportView(jTable1);
+        jScrollPane2.setViewportView(jDashboardTable);
 
         jLabel3.setText("Vaccine left:");
 
@@ -439,43 +441,48 @@ public class AdminPanel extends javax.swing.JFrame {
         jLabel20.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel20.setText("Currently Registered:");
 
+        jButton5.setText("Show");
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout panelDashboardLayout = new javax.swing.GroupLayout(panelDashboard);
         panelDashboard.setLayout(panelDashboardLayout);
         panelDashboardLayout.setHorizontalGroup(
             panelDashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelDashboardLayout.createSequentialGroup()
-                .addGap(6, 6, 6)
-                .addGroup(panelDashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2)
+                .addGap(19, 19, 19)
+                .addGroup(panelDashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(panelDashboardLayout.createSequentialGroup()
-                        .addGap(13, 13, 13)
-                        .addGroup(panelDashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(panelDashboardLayout.createSequentialGroup()
-                                .addComponent(jLabel14)
-                                .addGap(18, 18, 18)
-                                .addComponent(vaccineRegister, javax.swing.GroupLayout.PREFERRED_SIZE, 196, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(panelDashboardLayout.createSequentialGroup()
-                                .addComponent(jLabel17)
-                                .addGap(18, 18, 18)
-                                .addComponent(firstDoseNo, javax.swing.GroupLayout.PREFERRED_SIZE, 196, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(panelDashboardLayout.createSequentialGroup()
-                                .addComponent(jLabel3)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(vaccineLeft, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel19)
-                                .addGap(18, 18, 18)
-                                .addComponent(firstDoseNo1, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel18)
-                                .addGap(24, 24, 24)
-                                .addComponent(vaccineAdministered, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelDashboardLayout.createSequentialGroup()
-                                .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 243, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
+                        .addComponent(jLabel14)
+                        .addGap(18, 18, 18)
+                        .addComponent(vaccineRegister, javax.swing.GroupLayout.PREFERRED_SIZE, 196, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(panelDashboardLayout.createSequentialGroup()
+                        .addComponent(jLabel17)
+                        .addGap(18, 18, 18)
+                        .addComponent(firstDoseNo, javax.swing.GroupLayout.PREFERRED_SIZE, 196, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(panelDashboardLayout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(vaccineLeft, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel19)
+                        .addGap(18, 18, 18)
+                        .addComponent(firstDoseNo1, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel18)
+                        .addGap(24, 24, 24)
+                        .addComponent(vaccineAdministered, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelDashboardLayout.createSequentialGroup()
+                        .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 243, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(panelDashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addComponent(jButton5)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 462, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         panelDashboardLayout.setVerticalGroup(
             panelDashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -501,8 +508,10 @@ public class AdminPanel extends javax.swing.JFrame {
                     .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel20, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 375, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jButton5)
+                .addGap(24, 24, 24))
         );
 
         panelDatabase.setMaximumSize(new java.awt.Dimension(550, 700));
@@ -803,7 +812,7 @@ public class AdminPanel extends javax.swing.JFrame {
         labelHome.setOpaque(true);
         labelHome.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                labelMouseClicked(evt);
+                none(evt);
             }
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 changeToHand(evt);
@@ -815,7 +824,7 @@ public class AdminPanel extends javax.swing.JFrame {
         labelDashboard.setName("3"); // NOI18N
         labelDashboard.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                labelMouseClicked(evt);
+                none(evt);
             }
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 changeToHand(evt);
@@ -827,7 +836,7 @@ public class AdminPanel extends javax.swing.JFrame {
         labelDatabase.setName("2"); // NOI18N
         labelDatabase.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                labelMouseClicked(evt);
+                none(evt);
             }
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 changeToHand(evt);
@@ -839,7 +848,7 @@ public class AdminPanel extends javax.swing.JFrame {
         labelSql.setName("3"); // NOI18N
         labelSql.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                labelMouseClicked(evt);
+                none(evt);
             }
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 changeToHand(evt);
@@ -894,7 +903,7 @@ public class AdminPanel extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void labelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_labelMouseClicked
+    private void none(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_none
         // TODO add your handling code here:
         JLabel currentLabel = (JLabel) evt.getComponent();
         currentLabel.setOpaque(true);
@@ -913,8 +922,12 @@ public class AdminPanel extends javax.swing.JFrame {
         currentLabel.setForeground(Color.WHITE);
 
         refresh();
-    }//GEN-LAST:event_labelMouseClicked
+        
+    }//GEN-LAST:event_none
 
+    
+  
+    
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
         new MainMenu().setVisible(true);
@@ -983,7 +996,7 @@ public class AdminPanel extends javax.swing.JFrame {
             }
 
             makeColumn(resultTable, columnNames);
-
+//          here
             objects = new Object[rowCount][colCount];
 
             int k = 0;
@@ -1443,6 +1456,40 @@ public class AdminPanel extends javax.swing.JFrame {
 
     }//GEN-LAST:event_jButton3ActionPerformed
 
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        // TODO add your handling code here:
+        addDashoardData();
+    }//GEN-LAST:event_jButton5ActionPerformed
+
+    
+    private void addDashoardData() {
+        try {
+            String query = "SELECT p.Identifier, p.Age, p.City, p.Area, v.First_Dose_Date, v.Second_Dose_Date " +
+                    "FROM VACCINE v JOIN (SELECT Birth_Registration_Number AS 'Identifier' , Birth_Date, Mobile_Number, City, Area, Ward_Number, Age " +
+                    "FROM PERSON_BIRTH_C UNION SELECT NID AS 'Identifier', Birth_Date, Mobile_Number, City, Area, Ward_Number, Age FROM PERSON_NID) p " +
+                    "ON (v.Identifier = p.Identifier) order by p.Age desc, v.First_Dose_Date asc";
+            
+            System.out.println(query);
+            ResultSet set = DBConnection.makeQuery(query);
+            
+            System.out.println(set.getRow());
+            
+            int colCount = set.getMetaData().getColumnCount();
+            System.out.println(colCount);
+            
+            dashboardColName = new ArrayList<>();
+            for (int i = 1; i <= colCount; i++) {
+                dashboardColName.add(set.getMetaData().getColumnName(i));
+            }
+            
+            makeColumn(jDashboardTable, dashboardColName);
+            
+        } catch (SQLException ex) {
+            System.out.println("Something wromg");
+        }
+    }
+    
+    
     /**
      * @param args the command line arguments
      */
@@ -1470,6 +1517,8 @@ public class AdminPanel extends javax.swing.JFrame {
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton5;
+    private javax.swing.JTable jDashboardTable;
     private javax.swing.JEditorPane jEditorPane1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
@@ -1498,7 +1547,6 @@ public class AdminPanel extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JTable jTable1;
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextArea jTextArea2;
     private javax.swing.JTextField jTextField1;
