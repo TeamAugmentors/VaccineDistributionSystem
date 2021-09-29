@@ -655,7 +655,9 @@ public class RegisterForm extends javax.swing.JFrame {
             nextButton.setEnabled(true);
         }
     }
-
+    //comment
+    
+    
     private void registerUser(String str) {
         try {
             int isAffected;
