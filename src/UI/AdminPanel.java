@@ -67,6 +67,9 @@ public class AdminPanel extends javax.swing.JFrame {
 
     Object[][] objects;
     JFrame bigTableFrame = null;
+    
+    String databaseQuery = null;
+    String dashBoardQuery = null;
 
     HashMap<JLabel, JPanel> map = new HashMap<>();
 
@@ -103,7 +106,7 @@ public class AdminPanel extends javax.swing.JFrame {
 
         boxTables.addItemListener((e) -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
-                
+
                 generateColumnCheckboxes(tableColumnMap.get(e.getItem().toString()));
                 executeButtonActionPerformed(null);
             }
@@ -461,7 +464,7 @@ public class AdminPanel extends javax.swing.JFrame {
             panelDashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelDashboardLayout.createSequentialGroup()
                 .addGap(19, 19, 19)
-                .addGroup(panelDashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(panelDashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(panelDashboardLayout.createSequentialGroup()
                         .addComponent(jLabel14)
                         .addGap(18, 18, 18)
@@ -482,13 +485,14 @@ public class AdminPanel extends javax.swing.JFrame {
                         .addComponent(jLabel18)
                         .addGap(24, 24, 24)
                         .addComponent(vaccineAdministered, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelDashboardLayout.createSequentialGroup()
-                        .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 243, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(panelDashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addComponent(jButton5)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 462, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(panelDashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panelDashboardLayout.createSequentialGroup()
+                            .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 243, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panelDashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jButton5)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 462, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         panelDashboardLayout.setVerticalGroup(
@@ -912,7 +916,7 @@ public class AdminPanel extends javax.swing.JFrame {
 
     private void none(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_none
         // TODO add your handling code here:
-        if(evt.getComponent() == labelDashboard){
+        if (evt.getComponent() == labelDashboard) {
             addDashoardData();
         }
         JLabel currentLabel = (JLabel) evt.getComponent();
@@ -932,12 +936,10 @@ public class AdminPanel extends javax.swing.JFrame {
         currentLabel.setForeground(Color.WHITE);
 
         refresh();
-        
+
     }//GEN-LAST:event_none
 
-    
-  
-    
+
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
         new MainMenu().setVisible(true);
@@ -984,7 +986,7 @@ public class AdminPanel extends javax.swing.JFrame {
         if (!whereTextField.getText().equals("")) {
             query += " WHERE " + whereTextField.getText();
         }
-
+        databaseQuery = query;
         try {
             ResultSet set = DBConnection.makeQuery(query);
             ResultSet set2 = DBConnection.makeQuery(query);
@@ -1006,7 +1008,6 @@ public class AdminPanel extends javax.swing.JFrame {
             }
 
             makeColumn(resultTable, columnNames);
-//          here
             objects = new Object[rowCount][colCount];
 
             int k = 0;
@@ -1054,67 +1055,21 @@ public class AdminPanel extends javax.swing.JFrame {
     }//GEN-LAST:event_whereTextFieldActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
-        if (columnNames == null) {
-
-        } else if (bigTableFrame == null) {
-
-            JFrame jFrame = new JFrame();
-
-            jFrame.addWindowListener(new WindowAdapter() {
-                @Override
-                public void windowClosing(WindowEvent e) {
-
-                    bigTableFrame = null;
-                    e.getWindow().dispose();
-                }
-            });
-
-            JPanel panel;
-            jFrame.add(panel = new JPanel(new GridLayout(1, 1)));
-
-            JTable newTable = new JTable() {
-                @Override
-                public boolean editCellAt(int row, int column, EventObject e) {
-                    return false;//To change body of generated methods, choose Tools | Templates.
-                }
-            };
-
-            makeColumn(newTable, columnNames);
-
-            for (Object[] object : objects) {
-                getDefaultTableModel(newTable).addRow(object);
-            }
-
-            DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
-            rightRenderer.setHorizontalAlignment(SwingConstants.CENTER);
-
-            TableModel tableModel = newTable.getModel();
-
-            for (int columnIndex = 0; columnIndex < tableModel.getColumnCount(); columnIndex++) {
-                newTable.getColumnModel().getColumn(columnIndex).setCellRenderer(rightRenderer);
-            }
-
-            panel.add(new JScrollPane(newTable));
-
-            jFrame.setResizable(true);
-            jFrame.setLocationRelativeTo(null);
-            jFrame.setIconImage(new ImageIcon("resources/UI/syringe.png").getImage());
-            jFrame.setTitle("Results Table");
-            jFrame.pack();
-            jFrame.setVisible(true);
-
-            bigTableFrame = jFrame;
-
-        } else {
-            bigTableFrame.requestFocus();
+        try {
+            makeNewTableAndShow(databaseQuery);
+        } catch (SQLException ex) {
+            System.out.println("Error in Database big table");
         }
-
     }//GEN-LAST:event_jButton2ActionPerformed
+
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         // TODO add your handling code here:
-
+         try {
+            makeNewTableAndShow(dashBoardQuery);
+        } catch (SQLException ex) {
+            System.out.println("Error in Dashboard big table");
+        }
     }//GEN-LAST:event_jButton4ActionPerformed
 
     DefaultTableModel getDefaultTableModel(JTable table) {
@@ -1285,11 +1240,6 @@ public class AdminPanel extends javax.swing.JFrame {
             int j = 0;
 
             for (int i = 0; i < columnCount; i++) {
-//            if (i < resultTable.getColumnCount() - 1) {               
-//                    deleteQuery += tableColumnMap.get(table).get(i) + "='" + resultTable.getModel().getValueAt(resultTable.getSelectedRow(), i) + "'";               
-//            } else {
-//                    deleteQuery += tableColumnMap.get(table).get(i) + "='" + resultTable.getModel().getValueAt(resultTable.getSelectedRow(), i) + "' AND ";              
-//            }
                 if (resultTable.getModel().getValueAt(resultTable.getSelectedRow(), i) != null) {
                     colName[j] = tableColumnMap.get(table).get(i);
                     data[j] = resultTable.getModel().getValueAt(resultTable.getSelectedRow(), i).toString();
@@ -1305,7 +1255,6 @@ public class AdminPanel extends javax.swing.JFrame {
                 }
             }
 
-            System.out.println(deleteQuery);
             try {
                 DBConnection.makeQuery(deleteQuery);
 
@@ -1313,8 +1262,11 @@ public class AdminPanel extends javax.swing.JFrame {
                 if (e.getErrorCode() != 0) {
                     JOptionPane.showMessageDialog(this, "Error! " + e.getMessage() + "--->" + deleteQuery);
                 } else {
+                    if (boxTables.getSelectedItem().toString().equals("PERSON_NID") || boxTables.getSelectedItem().toString().equals("PERSON_BIRTH_C")) {
+                        deleteFromVaccine(data[0]);
+                        deleteFromCovidAffected(data[0]);
+                    }
                     JOptionPane.showMessageDialog(this, "Successfully deleted!");
-
                     refresh();
                 }
             }
@@ -1323,6 +1275,24 @@ public class AdminPanel extends javax.swing.JFrame {
         }
 
     }//GEN-LAST:event_buttonDeleteRowActionPerformed
+
+    private void deleteFromVaccine(String identifier) {
+        String query = "DELETE FROM VACCINE WHERE Identifier = '" + identifier + "'";
+        try {
+            DBConnection.makeQuery(query);
+        } catch (SQLException ex) {
+            System.out.println("Something went wrong");
+        }
+    }
+
+    private void deleteFromCovidAffected(String identifier) {
+        String query = "DELETE FROM COVID_AFFECTED WHERE Identifier = '" + identifier + "'";
+        try {
+            DBConnection.makeQuery(query);
+        } catch (SQLException ex) {
+            System.out.println("Something went wrong");
+        }
+    }
 
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
         // TODO add your handling code here:
@@ -1374,8 +1344,6 @@ public class AdminPanel extends javax.swing.JFrame {
                 }
             }
         }
-
-
     }//GEN-LAST:event_buttonExecuteSelectedTextActionPerformed
 
     void makeNewTableAndShow(String query) throws SQLException {
@@ -1475,44 +1443,51 @@ public class AdminPanel extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_panelDashboardMouseClicked
 
-    
     private void addDashoardData() {
+        int registered = 0;
+        int firstDoseGiven = 0;
+        int secondDoseGiven = 0;
         try {
-            String query = "SELECT p.Identifier, p.Age, p.City, p.Area, v.First_Dose_Date, v.Second_Dose_Date " +
-                    "FROM VACCINE v JOIN (SELECT Birth_Registration_Number AS 'Identifier' , Birth_Date, Mobile_Number, City, Area, Ward_Number, Age " +
-                    "FROM PERSON_BIRTH_C UNION SELECT NID AS 'Identifier', Birth_Date, Mobile_Number, City, Area, Ward_Number, Age FROM PERSON_NID) p " +
-                    "ON (v.Identifier = p.Identifier) order by p.Age desc, v.First_Dose_Date asc";
-            
+            String query = "SELECT p.Identifier, p.Age, p.City, p.Area, v.First_Dose_Date, v.Second_Dose_Date "
+                    + "FROM VACCINE v JOIN (SELECT Birth_Registration_Number AS 'Identifier' , Birth_Date, Mobile_Number, City, Area, Ward_Number, Age "
+                    + "FROM PERSON_BIRTH_C UNION SELECT NID AS 'Identifier', Birth_Date, Mobile_Number, City, Area, Ward_Number, Age FROM PERSON_NID) p "
+                    + "ON (v.Identifier = p.Identifier) order by p.Age desc, v.First_Dose_Date asc";
+            dashBoardQuery = query;
             ResultSet set = DBConnection.makeQuery(query);
-            
+
             int colCount = set.getMetaData().getColumnCount();
             System.out.println(colCount);
-            
+
             dashboardColName = new ArrayList<>();
             for (int i = 1; i <= colCount; i++) {
                 dashboardColName.add(set.getMetaData().getColumnName(i));
             }
-            
+
             makeColumn(jDashboardTable, dashboardColName);
             
-            ArrayList<ArrayList<Object>> rows = new ArrayList<>();
-            
-            while(set.next()){
-                ArrayList<Object> temp = new ArrayList<>(); 
-                for(int i=1; i<=colCount; i++){
-                    temp.add(set.getString(dashboardColName.get(i-1)));
+            while (set.next()) {
+                ArrayList<Object> temp = new ArrayList<>();
+                if (set.getString(dashboardColName.get(4)) == null) {
+                    firstDoseGiven++;
+                }
+                if (set.getString(dashboardColName.get(5)) == null) {
+                    secondDoseGiven++;
+                }
+                for (int i = 1; i <= colCount; i++) {
+                    
+                    temp.add(set.getString(dashboardColName.get(i - 1)));
                 }
                 getDefaultTableModel(jDashboardTable).addRow(temp.toArray());
+                registered++;
             }
-            
-//            getDefaultTableModel(jDashboardTable).addRow(rows.toArray());
-            
         } catch (SQLException ex) {
             System.out.println("Something wromg");
         }
+        firstDoseNo1.setText(String.valueOf(firstDoseGiven + secondDoseGiven));
+        vaccineRegister.setText(String.valueOf(registered));
+        firstDoseNo.setText(String.valueOf(registered - firstDoseGiven));
     }
-    
-    
+
     /**
      * @param args the command line arguments
      */

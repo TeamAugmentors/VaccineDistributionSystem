@@ -13,6 +13,8 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Stack;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -668,7 +670,6 @@ public class RegisterForm extends javax.swing.JFrame {
                     + "'" + isAffected + "',"
                     + "'" + ageLabel.getText().split(" ")[2] + "')";
 
-            
             DBConnection.makeQuery(query);
 
         } catch (SQLException ex) {
@@ -683,14 +684,12 @@ public class RegisterForm extends javax.swing.JFrame {
                             + "'" + locationDropDown.getSelectedItem().toString() + "',"
                             + "'" + wardNumberSpinner.getValue() + "',"
                             + "'" + ageLabel.getText().split(" ")[2] + "')");
-                    
-                    
-                    String queryVaccine = "INSERT INTO VACCINE(Identifier) VALUES ('" + idTextField.getText() + "')";
-                    
-                    DBConnection.makeQuery(queryVaccine);
 
                 } catch (SQLException ex1) {
+
                     if (ex1.getErrorCode() == 0) {
+                        addIntoVaccine(idTextField.getText());
+                        addIntoCovidAffected(idTextField.getText());
                         JOptionPane.showMessageDialog(this, "Registration Successful!");
                         new MainMenu().setVisible(true);
                         dispose();
@@ -701,6 +700,23 @@ public class RegisterForm extends javax.swing.JFrame {
             } else {
                 JOptionPane.showMessageDialog(this, "Sorry you are not old enough for the vaccine");
             }
+        }
+    }
+
+    private void addIntoVaccine(String identifier) {
+        String queryVaccine = "INSERT INTO VACCINE(Identifier) VALUES ('" + identifier + "')";
+        try {
+            DBConnection.makeQuery(queryVaccine);
+        } catch (SQLException e) {
+            System.out.println("Error in adding into Vaccine");
+        }
+    }
+    private void addIntoCovidAffected(String identifier) {
+        String queryVaccine = "INSERT INTO COVID_AFFECTED(Identifier) VALUES ('" + identifier + "')";
+        try {
+            DBConnection.makeQuery(queryVaccine);
+        } catch (SQLException e) {
+            System.out.println("Error in adding into Covid Affected");
         }
     }
 
