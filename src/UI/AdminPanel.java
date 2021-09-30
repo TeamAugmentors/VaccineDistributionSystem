@@ -67,7 +67,7 @@ public class AdminPanel extends javax.swing.JFrame {
 
     Object[][] objects;
     JFrame bigTableFrame = null;
-    
+
     String databaseQuery = null;
     String dashBoardQuery = null;
 
@@ -1065,7 +1065,7 @@ public class AdminPanel extends javax.swing.JFrame {
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         // TODO add your handling code here:
-         try {
+        try {
             makeNewTableAndShow(dashBoardQuery);
         } catch (SQLException ex) {
             System.out.println("Error in Dashboard big table");
@@ -1456,36 +1456,94 @@ public class AdminPanel extends javax.swing.JFrame {
             ResultSet set = DBConnection.makeQuery(query);
 
             int colCount = set.getMetaData().getColumnCount();
-            System.out.println(colCount);
 
             dashboardColName = new ArrayList<>();
+            dashboardColName.add("Serial");
             for (int i = 1; i <= colCount; i++) {
                 dashboardColName.add(set.getMetaData().getColumnName(i));
             }
-
+            dashboardColName.add("Center");
             makeColumn(jDashboardTable, dashboardColName);
-            
+
             while (set.next()) {
-                ArrayList<Object> temp = new ArrayList<>();
-                if (set.getString(dashboardColName.get(4)) == null) {
+                if (set.getString(dashboardColName.get(5)) == null) {
                     firstDoseGiven++;
                 }
-                if (set.getString(dashboardColName.get(5)) == null) {
+                if (set.getString(dashboardColName.get(6)) == null) {
                     secondDoseGiven++;
                 }
-                for (int i = 1; i <= colCount; i++) {
-                    
-                    temp.add(set.getString(dashboardColName.get(i - 1)));
+                if (set.getString(dashboardColName.get(5)) != null && set.getString(dashboardColName.get(6)) != null) {
+                    continue;
                 }
+                ArrayList<Object> temp = new ArrayList<>();
+                temp.add(registered + 1);
+                for (int i = 1; i <= colCount; i++) {
+
+                    temp.add(set.getString(dashboardColName.get(i)));
+                }
+                //Get the city name
+                String center = getCenter(set.getString(dashboardColName.get(3)));
+                temp.add(center);
                 getDefaultTableModel(jDashboardTable).addRow(temp.toArray());
                 registered++;
             }
         } catch (SQLException ex) {
-            System.out.println("Something wromg");
+            System.out.println("Something wrong");
         }
         firstDoseNo1.setText(String.valueOf(firstDoseGiven + secondDoseGiven));
         vaccineRegister.setText(String.valueOf(registered));
         firstDoseNo.setText(String.valueOf(registered - firstDoseGiven));
+        updateAmountLeft();
+        updateAmountAdministered();
+    }
+
+    private void updateAmountLeft() {
+        String query = "SELECT SUM(Amount_Left) AS Amount_Left FROM STORAGE";
+        try {
+            ResultSet set = DBConnection.makeQuery(query);
+            if (set.next()) {
+                vaccineLeft.setText(String.valueOf(set.getInt("Amount_Left")));
+//                System.out.println(set.getString("Amount_Left"));
+            } else {
+                System.out.println("Unavailable");
+            }
+        } catch (SQLException ex) {
+            System.out.println("Error in faching amount left info");
+        }
+    }
+
+    private void updateAmountAdministered() {
+        String query = "SELECT SUM(Amount_Administered) AS Amount_Administered FROM STORAGE";
+        try {
+            ResultSet set = DBConnection.makeQuery(query);
+            if (set.next()) {
+                vaccineAdministered.setText(String.valueOf(set.getInt("Amount_Administered")));
+//                System.out.println(set.getString("Amount_Administered"));
+            } else {
+                System.out.println("Unavailable");
+            }
+        } catch (SQLException ex) {
+            System.out.println("Error in faching amount administered info");
+        }
+    }
+
+    private String getCenter(String city) {
+        String query = "SELECT Institute_Name FROM VACCINATION_CENTER WHERE Center_ID = "
+                + "ANY(SELECT Center_ID FROM STORAGE WHERE Amount_Left = ANY(SELECT MAX(Amount_Left) "
+                + "FROM (SELECT v.*, s.Amount_Left "
+                + "FROM STORAGE s JOIN (SELECT * FROM VACCINATION_CENTER WHERE City = "
+                + "ANY((SELECT City FROM PERSON_BIRTH_C UNION SELECT City FROM PERSON_NID) INTERSECT SELECT city FROM VACCINATION_CENTER)) v "
+                + "ON v.Center_ID = s.Center_ID) VS GROUP BY City HAVING City = '" + city + "'))";
+//        System.out.println(query);
+        try {
+            ResultSet set = DBConnection.makeQuery(query);
+            if (set.next()) {
+                return set.getString("Institute_Name");
+            }
+        } catch (SQLException ex) {
+            System.out.println("Error in faching center info");
+        }
+        return "N/A";
     }
 
     /**

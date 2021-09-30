@@ -128,19 +128,21 @@ Center_Id INT FOREIGN KEY REFERENCES VACCINATION_CENTER (Center_Id),
 Vaccine_Brand varchar(45) FOREIGN KEY REFERENCES DISTRIBUTION_CENTER (Vaccine_Brand)
 );
 
-SELECT * FROM VACCINE
 
-INSERT INTO VACCINATION_CENTER VALUES
-			(1, 'Mohanagar Institute', 4000, 'Dhaka', 'Shantinagar', 4)
-
+		
 			
 INSERT INTO VACCINATION_CENTER VALUES
+			(1, 'Mohanagar Institute', 4000, 'Dhaka', 'Shantinagar', 4),
 			(2, 'Jahangir Institute', 6000, 'Dhaka', 'Dhanmonddi', 1),
 			(3, 'Some institute', 5693, 'Chittagong', 'Chittagong', 6),
 			(5, 'Think Insititute', 6395, 'Dhaka', 'Gulshan', 5),
 			(4, 'Popular Diagnostics', 356, 'Dhaka', 'Shahabhag', 2),
 			(7, 'Eye Diagnostics', 3621, 'Narayanganj', 'Narayanganj', 7),
 			(26, 'Yes Hospital', 3111, 'Dhaka', 'Cantonment', 70);
+
+
+SELECT * FROM VACCINE
+SELECT * FROM VACCINATION_CENTER
 
 INSERT INTO VACCINE (Identifier, First_Dose_Date, Second_Dose_Date, Center_Id, Vaccine_Brand)
 VALUES ('121434334', '2020-09-20', '2020-12-09', 1, 'AstraZeneca'),
@@ -154,6 +156,11 @@ INSERT INTO ADMIN_PANEL VALUES ('Sanjid', 'Chowdhury', 'Lassassin', '123456'),
 							   ('Atikur', 'Rahman', 'Atiq', '123456'),
 							   ('Tanim', 'Ahmed', 'A.S.T.', '123456')
 
+INSERT INTO STORAGE VALUES(10, 20, 5, '2021-09-08', '2022-09-22', 26, 'Pfizer', 0)
+INSERT INTO STORAGE VALUES(11, 20, 15, '2021-09-08', '2021-09-22', 3, 'Morderna', 0)
+INSERT INTO STORAGE VALUES(12, 20, 25, '2021-09-08', '2023-09-22', 2, 'Sputnik V', 0)
+SELECT * FROM STORAGE
+
 SELECT * FROM ADMIN_PANEL
 
 SELECT Username, PasswordHash FROM ADMIN_PANEL WHERE Username='Lassassin' AND PasswordHash = '123456'
@@ -163,7 +170,7 @@ ADD FOREIGN KEY (Batch_Number) REFERENCES STORAGE(Batch_Number);
 
 
 select * from ADMIN_PANEL
-
+SELECT * FROM PERSON_NID
 
 SELECT p.Identifier, p.Age, p.City, p.Area, v.First_Dose_Date, v.Second_Dose_Date
 FROM VACCINE v JOIN (SELECT Birth_Registration_Number AS 'Identifier' , Birth_Date, Mobile_Number, City, Area, Ward_Number, Age  FROM PERSON_BIRTH_C UNION
@@ -171,9 +178,26 @@ FROM VACCINE v JOIN (SELECT Birth_Registration_Number AS 'Identifier' , Birth_Da
 ON (v.Identifier = p.Identifier)
 order by p.Age desc, v.First_Dose_Date asc
 
-(SELECT center_id FROM VACCINATION_CENTER
-WHERE City = ( (SELECT City FROM PERSON_BIRTH_C UNION
-				SELECT City FROM PERSON_NID) INTERSECT SELECT city FROM VACCINATION_CENTER) )
+--Finding corresponding institution where max amount of vaccine is left--
+SELECT Institute_Name FROM VACCINATION_CENTER WHERE Center_ID =
+(SELECT Center_ID FROM STORAGE 
+WHERE Amount_Left = (SELECT MAX(Amount_Left) FROM
+(SELECT v.*, s.Amount_Left FROM STORAGE s JOIN (SELECT Center_ID FROM VACCINATION_CENTER
+WHERE City = ANY((SELECT City FROM PERSON_BIRTH_C UNION
+				SELECT City FROM PERSON_NID) INTERSECT SELECT city FROM VACCINATION_CENTER)) v ON
+				v.Center_ID = s.Center_ID) VS))
+
+SELECT Institute_Name FROM VACCINATION_CENTER WHERE Center_ID = 
+ANY(SELECT Center_ID FROM STORAGE WHERE Amount_Left = ANY(SELECT MAX(Amount_Left)
+												  FROM (SELECT v.*, s.Amount_Left 
+														FROM STORAGE s JOIN (SELECT * FROM VACCINATION_CENTER WHERE City = 
+																			 ANY((SELECT City FROM PERSON_BIRTH_C UNION SELECT City FROM PERSON_NID) INTERSECT SELECT city FROM VACCINATION_CENTER)) v
+														ON v.Center_ID = s.Center_ID) VS GROUP BY City HAVING City = 'Chittagong'))
+-------------------------------------------------------------------------
+--Amount left--
+SELECT SUM(Amount_left) FROM STORAGE
+---------------
+
 
 SELECT u.NID AS 'Identifier', id.FullName, u.Birth_Date, id.Gender, v.First_Dose_Date, v.Vaccine_Brand, v.Second_Dose_Date, v.Vaccine_Brand, vc.Institute_Name  FROM VACCINE v INNER JOIN
 (SELECT * FROM PERSON_NID UNION SELECT * FROM PERSON_BIRTH_C) u ON u.NID = v.identifier INNER JOIN
@@ -183,6 +207,8 @@ VACCINATION_CENTER vc ON vc.Center_ID = v.Center_Id WHERE v.Identifier = '121434
 SELECT v.Center_Id, v.Identifier, id.FullName, id.Gender,v.First_Dose_Date, v.Second_Dose_Date,v.Vaccine_Brand, vc.Institute_Name FROM VACCINE v
 INNER JOIN VACCINATION_CENTER vc ON v.Center_ID = vc.Center_Id
 INNER JOIN IDENTIFIER_INFORMATION id ON v.Identifier = id.Identifier WHERE v.Identifier= '1234'
+
+SELECT * FROM IDENTIFIER_INFORMATION WHERE IDENTIFIER = '121434334'
 
 
 
@@ -199,8 +225,8 @@ INSERT INTO IDENTIFIER_INFORMATION VALUES
 ('1234', 'Riskkara'                      , 'M'    ),
 ('1000000000', 'Sanjid Islam Chowhudry'  , 'M'   ),
 ('1000000001', 'Atikur Rahman'           , 'M'      ),
-('1000000002', 'Ahmed tanim'             , 'M'        ),
-('1000000003', 'Rishtat Ranzim'          , 'M'       ),
+('1000000002', 'Ahmed tanim'             , 'M'  ),
+('1000000003', 'Rishtat Ranzim'          , 'M' ),
 ('10248','Wilman Kala					   ', 'F'),
 ('10249','Tradição Hipermercados		   ', 'F'),
 ('10250','Hanari Carnes					   ', 'F'),
@@ -211,7 +237,8 @@ INSERT INTO IDENTIFIER_INFORMATION VALUES
 ('10255','Richter Supermarkt			   ', 'F'),
 ('10256','Wellington Importadora		   ', 'F'),
 ('10257','HILARIÓN-Abastos				   ', 'F'),
-('10258','Ernst Handel					   ', 'F'),
+('10258','Ernst Handel					   ', 'F')
+--
 ('10259','Centro comercial Moctezuma		   '),
 ('10260','Old World Delicatessen			   '),
 ('10261','Que Delícia					   '),
@@ -397,5 +424,3 @@ INSERT INTO IDENTIFIER_INFORMATION VALUES
 ('10441','Old World Delicatessen			   '),
 ('10442','Ernst Handel					   '),
 ('10443','Reggiani Caseifici                ')
-
-

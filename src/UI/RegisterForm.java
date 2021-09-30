@@ -657,6 +657,22 @@ public class RegisterForm extends javax.swing.JFrame {
     }
 
     private void registerUser(String str) {
+
+        String query = "SELECT * FROM IDENTIFIER_INFORMATION WHERE IDENTIFIER = '" + idTextField.getText() + "'";
+        try {
+            ResultSet set = DBConnection.makeQuery(query);
+            if (set.next()) {
+                continueRegister(str);
+            } else {
+                JOptionPane.showMessageDialog(this, "Identifier does not exist");
+            }
+        } catch (SQLException ex) {
+            System.out.println("Something went wrong");
+        }
+
+    }
+
+    private void continueRegister(String str) {
         try {
             int isAffected;
 
@@ -669,12 +685,10 @@ public class RegisterForm extends javax.swing.JFrame {
             String query = "INSERT INTO COVID_AFFECTED(Identifier, IsAffected, Age_Allowed_Vaccine) VALUES ('" + idTextField.getText() + "' ,"
                     + "'" + isAffected + "',"
                     + "'" + ageLabel.getText().split(" ")[2] + "')";
-
             DBConnection.makeQuery(query);
 
         } catch (SQLException ex) {
             if (ex.getErrorCode() == 0) {
-
                 try {
                     DBConnection.makeQuery("INSERT INTO " + str + " "
                             + "VALUES ('" + idTextField.getText() + "',"
@@ -698,6 +712,7 @@ public class RegisterForm extends javax.swing.JFrame {
                     }
                 }
             } else {
+                System.out.println(ex.getMessage());
                 JOptionPane.showMessageDialog(this, "Sorry you are not old enough for the vaccine");
             }
         }
@@ -711,6 +726,7 @@ public class RegisterForm extends javax.swing.JFrame {
             System.out.println("Error in adding into Vaccine");
         }
     }
+
     private void addIntoCovidAffected(String identifier) {
         String queryVaccine = "INSERT INTO COVID_AFFECTED(Identifier) VALUES ('" + identifier + "')";
         try {
