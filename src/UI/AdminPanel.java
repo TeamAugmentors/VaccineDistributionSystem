@@ -1476,6 +1476,7 @@ public class AdminPanel extends javax.swing.JFrame {
                     continue;
                 }
                 ArrayList<Object> temp = new ArrayList<>();
+//                Resultset set = DBConnection.makeQuery("SELECT Serial as 'Serial' FROM Covid_Affected");
                 temp.add(registered + 1);
                 for (int i = 1; i <= colCount; i++) {
 

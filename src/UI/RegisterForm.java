@@ -681,10 +681,12 @@ public class RegisterForm extends javax.swing.JFrame {
             } else {
                 isAffected = 1;
             }
-
-            String query = "INSERT INTO COVID_AFFECTED(Identifier, IsAffected, Age_Allowed_Vaccine) VALUES ('" + idTextField.getText() + "' ,"
+            
+            int serial = getSerialCount();
+            String query = "INSERT INTO COVID_AFFECTED(Identifier, IsAffected, Age_Allowed_Vaccine, Serial) VALUES ('" + idTextField.getText() + "' ,"
                     + "'" + isAffected + "',"
-                    + "'" + ageLabel.getText().split(" ")[2] + "')";
+                    + "'" + ageLabel.getText().split(" ")[2] + "',"
+                    + "'" + serial + "')";
             DBConnection.makeQuery(query);
 
         } catch (SQLException ex) {
@@ -718,6 +720,19 @@ public class RegisterForm extends javax.swing.JFrame {
         }
     }
 
+    private int getSerialCount(){
+        String serial = "SELECT COUNT(Serial) AS Serial FROM COVID_AFFECTED";
+        try {
+            ResultSet set = DBConnection.makeQuery(serial);
+            if(set.next()){
+                return set.getInt("Serial");
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(RegisterForm.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return 1;
+    }
+    
     private void addIntoVaccine(String identifier) {
         String queryVaccine = "INSERT INTO VACCINE(Identifier) VALUES ('" + identifier + "')";
         try {

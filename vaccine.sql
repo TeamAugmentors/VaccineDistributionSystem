@@ -355,7 +355,8 @@ CREATE TABLE COVID_AFFECTED
 (
 Identifier VARCHAR(17) NOT NULL PRIMARY KEY,
 IsAffected INT NOT NULL,
-Age_Allowed_Vaccine INT NOT NULL CHECK (Age_Allowed_Vaccine >= 18)
+Age_Allowed_Vaccine INT NOT NULL CHECK (Age_Allowed_Vaccine >= 18),
+Serial INT NOT NULL
 );
 
 SELECT * FROM COVID_AFFECTED
