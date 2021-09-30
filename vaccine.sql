@@ -9,7 +9,13 @@ DROP TABLE IF EXISTS VACCINE;
 DROP TABLE IF EXISTS STORAGE;
 DROP TABLE IF EXISTS ADMIN_PANEL;
 DROP TABLE IF EXISTS INFORMATION;
+DROP TABLE IF EXISTS IDENTIFIER_INFORMATION;
 
+CREATE TABLE IDENTIFIER_INFORMATION (
+	Identifier varchar(17) PRIMARY KEY NOT NULL,
+	FullName varchar(255) NOT NULL,
+	Gender char NOT NULL
+)
 
 CREATE TABLE ADMIN_PANEL (
 	ID INT IDENTITY(1 ,1) PRIMARY KEY NOT NULL,
@@ -62,6 +68,7 @@ INSERT INTO INFORMATION VALUES ('Dhaka', '"Abdullahpur", "Adabor", "Aftabnagar",
 ('Narayanganj', 'Narayanganj'),
 ('Gaibandha', 'Gaibandha'),
 ('Naogaon', 'Naogaon')
+
 CREATE TABLE PERSON_BIRTH_C
 (
 Birth_Registration_Number VARCHAR(17) NOT NULL  PRIMARY KEY,
@@ -116,13 +123,31 @@ CREATE TABLE VACCINE
 (
 Identifier VARCHAR(17) UNIQUE,
 First_Dose_Date DATE NULL,
-Second_Dose_Date DATE NULL
+Second_Dose_Date DATE NULL,
+Center_Id INT FOREIGN KEY REFERENCES VACCINATION_CENTER (Center_Id),
+Vaccine_Brand varchar(45) FOREIGN KEY REFERENCES DISTRIBUTION_CENTER (Vaccine_Brand)
 );
 
 SELECT * FROM VACCINE
-INSERT INTO VACCINE (Identifier, First_Dose_Date, Second_Dose_Date)
-VALUES('121434334', '2020-09-20', '2020-12-09'),
-      ('1234', '2021-05-01', '2020-04-01');
+
+INSERT INTO VACCINATION_CENTER VALUES
+			(1, 'Mohanagar Institute', 4000, 'Dhaka', 'Shantinagar', 4)
+
+			
+INSERT INTO VACCINATION_CENTER VALUES
+			(2, 'Jahangir Institute', 6000, 'Dhaka', 'Dhanmonddi', 1),
+			(3, 'Some institute', 5693, 'Chittagong', 'Chittagong', 6),
+			(5, 'Think Insititute', 6395, 'Dhaka', 'Gulshan', 5),
+			(4, 'Popular Diagnostics', 356, 'Dhaka', 'Shahabhag', 2),
+			(7, 'Eye Diagnostics', 3621, 'Narayanganj', 'Narayanganj', 7),
+			(26, 'Yes Hospital', 3111, 'Dhaka', 'Cantonment', 70);
+
+INSERT INTO VACCINE (Identifier, First_Dose_Date, Second_Dose_Date, Center_Id, Vaccine_Brand)
+VALUES ('121434334', '2020-09-20', '2020-12-09', 1, 'AstraZeneca'),
+		('121433034', '2020-09-20', '2020-12-09', 7 , 'AstraZeneca'),
+	('122734334', '2020-09-20', '2020-12-09', 4 , 'Pfizer'),
+		('12164334', '2020-09-20', '2020-12-09', 26 , 'Pfizer'),
+      ('1234', '2021-05-01', '2020-04-01', 2 , 'Sputnik V');
 
 
 INSERT INTO ADMIN_PANEL VALUES ('Sanjid', 'Chowdhury', 'Lassassin', '123456'),
@@ -149,3 +174,228 @@ order by p.Age desc, v.First_Dose_Date asc
 (SELECT center_id FROM VACCINATION_CENTER
 WHERE City = ( (SELECT City FROM PERSON_BIRTH_C UNION
 				SELECT City FROM PERSON_NID) INTERSECT SELECT city FROM VACCINATION_CENTER) )
+
+SELECT u.NID AS 'Identifier', id.FullName, u.Birth_Date, id.Gender, v.First_Dose_Date, v.Vaccine_Brand, v.Second_Dose_Date, v.Vaccine_Brand, vc.Institute_Name  FROM VACCINE v INNER JOIN
+(SELECT * FROM PERSON_NID UNION SELECT * FROM PERSON_BIRTH_C) u ON u.NID = v.identifier INNER JOIN
+IDENTIFIER_INFORMATION id ON id.Identifier = v.Identifier INNER JOIN
+VACCINATION_CENTER vc ON vc.Center_ID = v.Center_Id WHERE v.Identifier = '121434334' AND v.Second_Dose_Date IS NOT NULL
+
+SELECT v.Center_Id, v.Identifier, id.FullName, id.Gender,v.First_Dose_Date, v.Second_Dose_Date,v.Vaccine_Brand, vc.Institute_Name FROM VACCINE v
+INNER JOIN VACCINATION_CENTER vc ON v.Center_ID = vc.Center_Id
+INNER JOIN IDENTIFIER_INFORMATION id ON v.Identifier = id.Identifier WHERE v.Identifier= '1234'
+
+
+
+SELECT * FROM VACCINE v
+INNER JOIN IDENTIFIER_INFORMATION ON v.Identifier = IDENTIFIER_INFORMATION.Identifier
+
+SELECT TOP 1000 * FROM IDENTIFIER_INFORMATION
+
+INSERT INTO IDENTIFIER_INFORMATION VALUES 
+('121434334', 'Ruhid mashuurf'           , 'M'   ),
+('121433034', 'Jongi Bhairun'            , 'M'   ),
+('122734334', 'Gabiru'                   , 'M'   ),
+('12164334', 'Ineza'                     , 'M'    ),
+('1234', 'Riskkara'                      , 'M'    ),
+('1000000000', 'Sanjid Islam Chowhudry'  , 'M'   ),
+('1000000001', 'Atikur Rahman'           , 'M'      ),
+('1000000002', 'Ahmed tanim'             , 'M'        ),
+('1000000003', 'Rishtat Ranzim'          , 'M'       ),
+('10248','Wilman Kala					   ', 'F'),
+('10249','Tradição Hipermercados		   ', 'F'),
+('10250','Hanari Carnes					   ', 'F'),
+('10251','Victuailles en stock			   ', 'F'),
+('10252','Suprêmes délices				   ', 'F'),
+('10253','Hanari Carnes					   ', 'F'),
+('10254','Chop-suey Chinese				   ', 'F'),
+('10255','Richter Supermarkt			   ', 'F'),
+('10256','Wellington Importadora		   ', 'F'),
+('10257','HILARIÓN-Abastos				   ', 'F'),
+('10258','Ernst Handel					   ', 'F'),
+('10259','Centro comercial Moctezuma		   '),
+('10260','Old World Delicatessen			   '),
+('10261','Que Delícia					   '),
+('10262','Rattlesnake Canyon Grocery		   '),
+('10263','Ernst Handel					   '),
+('10264','Folk och fä HB					   '),
+('10265','Blondel père et fils			   '),
+('10266','Wartian Herkku					   '),
+('10267','Frankenversand					   '),
+('10268','GROSELLA-Restaurante			   '),
+('10269','White Clover Markets			   '),
+('10270','Wartian Herkku					   '),
+('10271','Split Rail Beer & Ale			   '),
+('10272','Rattlesnake Canyon Grocery		   '),
+('10273','QUICK-Stop						   '),
+('10274','Vins et alcools Chevalier		   '),
+('10275','Magazzini Alimentari Riuniti	   '),
+('10276','Tortuga Restaurante			   '),
+('10277','Morgenstern Gesundkost			   '),
+('10278','Berglunds snabbköp				   '),
+('10279','Lehmanns Marktstand			   '),
+('10280','Berglunds snabbköp				   '),
+('10281','Romero y tomillo				   '),
+('10282','Romero y tomillo				   '),
+('10283','LILA-Supermercado				   '),
+('10284','Lehmanns Marktstand			   '),
+('10285','QUICK-Stop						   '),
+('10286','QUICK-Stop						   '),
+('10287','Ricardo Adocicados				   '),
+('10288','Reggiani Caseifici				   '),
+('10289','Bs Beverages					   '),
+('10290','Comércio Mineiro				   '),
+('10291','Que Delícia					   '),
+('10292','Tradição Hipermercados			   '),
+('10293','Tortuga Restaurante			   '),
+('10294','Rattlesnake Canyon Grocery		   '),
+('10295','Vins et alcools Chevalier		   '),
+('10296','LILA-Supermercado				   '),
+('10297','Blondel père et fils			   '),
+('10298','Hungry Owl All-Night Grocers	   '),
+('10299','Ricardo Adocicados				   '),
+('10300','Magazzini Alimentari Riuniti	   '),
+('10301','Die Wandernde Kuh				   '),
+('10302','Suprêmes délices				   '),
+('10303','Godos Cocina Típica			   '),
+('10304','Tortuga Restaurante			   '),
+('10305','Old World Delicatessen			   '),
+('10306','Romero y tomillo				   '),
+('10307','Lonesome Pine Restaurant		   '),
+('10308','Ana Trujillo Emparedados y helados'),
+('10309','Hungry Owl All-Night Grocers	   '),
+('10310','The Big Cheese					   '),
+('10311','Du monde entier				   '),
+('10312','Die Wandernde Kuh				   '),
+('10313','QUICK-Stop						   '),
+('10314','Rattlesnake Canyon Grocery		   '),
+('10315','Island Trading					   '),
+('10316','Rattlesnake Canyon Grocery		   '),
+('10317','Lonesome Pine Restaurant		   '),
+('10318','Island Trading					   '),
+('10319','Tortuga Restaurante			   '),
+('10320','Wartian Herkku					   '),
+('10321','Island Trading					   '),
+('10322','Pericles Comidas clásicas		   '),
+('10323','Königlich Essen				   '),
+('10324','Save-a-lot Markets				   '),
+('10325','Königlich Essen				   '),
+('10326','Bólido Comidas preparadas		   '),
+('10327','Folk och fä HB					   '),
+('10328','Furia Bacalhau e Frutos do Mar	   '),
+('10329','Split Rail Beer & Ale			   '),
+('10330','LILA-Supermercado				   '),
+('10331','Bon app						   '),
+('10332','Mère Paillarde					   '),
+('10333','Wartian Herkku					   '),
+('10334','Victuailles en stock			   '),
+('10335','Hungry Owl All-Night Grocers	   '),
+('10336','Princesa Isabel Vinhoss		   '),
+('10337','Frankenversand					   '),
+('10338','Old World Delicatessen			   '),
+('10339','Mère Paillarde					   '),
+('10340','Bon app						   '),
+('10341','Simons bistro					   '),
+('10342','Frankenversand					   '),
+('10343','Lehmanns Marktstand			   '),
+('10344','White Clover Markets			   '),
+('10345','QUICK-Stop						   '),
+('10346','Rattlesnake Canyon Grocery		   '),
+('10347','Familia Arquibaldo				   '),
+('10348','Die Wandernde Kuh				   '),
+('10349','Split Rail Beer & Ale			   '),
+('10350','La maison dAsie				   '),
+('10351','Ernst Handel					   '),
+('10352','Furia Bacalhau e Frutos do Mar	   '),
+('10353','Piccolo und mehr				   '),
+('10354','Pericles Comidas clásicas		   '),
+('10355','Around the Horn				   '),
+('10356','Die Wandernde Kuh				   '),
+('10357','LILA-Supermercado				   '),
+('10358','La maison dAsie				   '),
+('10359','Seven Seas Imports				   '),
+('10360','Blondel père et fils			   '),
+('10361','QUICK-Stop						   '),
+('10362','Bon app						   '),
+('10363','Drachenblut Delikatessend		   '),
+('10364','Eastern Connection				   '),
+('10365','Antonio Moreno Taquería		   '),
+('10366','Galería del gastrónomo			   '),
+('10367','Vaffeljernet					   '),
+('10368','Ernst Handel					   '),
+('10369','Split Rail Beer & Ale			   '),
+('10370','Chop-suey Chinese				   '),
+('10371','La maison dAsie				   '),
+('10372','Queen Cozinha					   '),
+('10373','Hungry Owl All-Night Grocers	   '),
+('10374','Wolski							   '),
+('10375','Hungry Coyote Import Store		   '),
+('10376','Mère Paillarde					   '),
+('10377','Seven Seas Imports				   '),
+('10378','Folk och fä HB					   '),
+('10379','Que Delícia					   '),
+('10380','Hungry Owl All-Night Grocers	   '),
+('10381','LILA-Supermercado				   '),
+('10382','Ernst Handel					   '),
+('10383','Around the Horn				   '),
+('10384','Berglunds snabbköp				   '),
+('10385','Split Rail Beer & Ale			   '),
+('10386','Familia Arquibaldo				   '),
+('10387','Santé Gourmet					   '),
+('10388','Seven Seas Imports				   '),
+('10389','Bottom-Dollar Marketse			   '),
+('10390','Ernst Handel					   '),
+('10391','Drachenblut Delikatessend		   '),
+('10392','Piccolo und mehr				   '),
+('10393','Save-a-lot Markets				   '),
+('10394','Hungry Coyote Import Store		   '),
+('10395','HILARIÓN-Abastos				   '),
+('10396','Frankenversand					   '),
+('10397','Princesa Isabel Vinhoss		   '),
+('10398','Save-a-lot Markets				   '),
+('10399','Vaffeljernet					   '),
+('10400','Eastern Connection				   '),
+('10401','Rattlesnake Canyon Grocery		   '),
+('10402','Ernst Handel					   '),
+('10403','Ernst Handel					   '),
+('10404','Magazzini Alimentari Riuniti	   '),
+('10405','LINO-Delicateses				   '),
+('10406','Queen Cozinha					   '),
+('10407','Ottilies Käseladen				   '),
+('10408','Folies gourmandes				   '),
+('10409','Océano Atlántico Ltda.			   '),
+('10410','Bottom-Dollar Marketse			   '),
+('10411','Bottom-Dollar Marketse			   '),
+('10412','Wartian Herkku					   '),
+('10413','La maison dAsie				   '),
+('10414','Familia Arquibaldo				   '),
+('10415','Hungry Coyote Import Store		   '),
+('10416','Wartian Herkku					   '),
+('10417','Simons bistro					   '),
+('10418','QUICK-Stop						   '),
+('10419','Richter Supermarkt				   '),
+('10420','Wellington Importadora			   '),
+('10421','Que Delícia					   '),
+('10422','Franchi S.p.A.					   '),
+('10423','Gourmet Lanchonetes			   '),
+('10424','Mère Paillarde					   '),
+('10425','La maison dAsie				   '),
+('10426','Galería del gastrónomo			   '),
+('10427','Piccolo und mehr				   '),
+('10428','Reggiani Caseifici				   '),
+('10429','Hungry Owl All-Night Grocers	   '),
+('10430','Ernst Handel					   '),
+('10431','Bottom-Dollar Marketse			   '),
+('10432','Split Rail Beer & Ale			   '),
+('10433','Princesa Isabel Vinhoss		   '),
+('10434','Folk och fä HB					   '),
+('10435','Consolidated Holdings			   '),
+('10436','Blondel père et fils			   '),
+('10437','Wartian Herkku					   '),
+('10438','Toms Spezialitäten				   '),
+('10439','Mère Paillarde					   '),
+('10440','Save-a-lot Markets				   '),
+('10441','Old World Delicatessen			   '),
+('10442','Ernst Handel					   '),
+('10443','Reggiani Caseifici                ')
+
+
