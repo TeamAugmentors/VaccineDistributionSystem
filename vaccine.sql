@@ -359,6 +359,9 @@ Age_Allowed_Vaccine INT NOT NULL CHECK (Age_Allowed_Vaccine >= 18),
 Serial INT NOT NULL
 );
 
+---------Count the current serial no-----------
+SELECT COUNT(Serial) AS Serial FROM COVID_AFFECTED
+
 SELECT * FROM COVID_AFFECTED
 
 CREATE TABLE VACCINE 
@@ -384,11 +387,10 @@ VALUES ('121434334', '2020-09-20', '2020-12-09', 1, 'AstraZeneca'),
 
 --------> Generating Identifier,age,city,area,dose dates for dashboard
 
-SELECT p.Identifier, p.Age, p.City, p.Area, v.First_Dose_Date, v.Second_Dose_Date
-FROM VACCINE v JOIN (SELECT Birth_Registration_Number AS 'Identifier' , Birth_Date, Mobile_Number, City, Area, Ward_Number, Age  FROM PERSON_BIRTH_C UNION
-					 SELECT NID AS 'Identifier', Birth_Date, Mobile_Number, City, Area, Ward_Number, Age FROM PERSON_NID) p
-ON (v.Identifier = p.Identifier)
-order by p.Age desc, v.First_Dose_Date asc
+SELECT c.Serial, p.Identifier, p.Age, p.City, p.Area, v.First_Dose_Date, v.Second_Dose_Date 
+	FROM VACCINE v JOIN (SELECT Birth_Registration_Number AS 'Identifier' , Birth_Date, Mobile_Number, City, Area, Ward_Number, Age 
+	FROM PERSON_BIRTH_C UNION SELECT NID AS 'Identifier', Birth_Date, Mobile_Number, City, Area, Ward_Number, Age FROM PERSON_NID) p 
+	ON (v.Identifier = p.Identifier) JOIN COVID_AFFECTED c ON (c.Identifier = p.Identifier) order by c.Serial asc, p.Age desc, v.First_Dose_Date asc 
 
 --Finding corresponding institution where max amount of vaccine is left
 
@@ -414,6 +416,10 @@ SELECT u.NID AS 'Identifier', id.FullName, u.Birth_Date, id.Gender, v.First_Dose
 IDENTIFIER_INFORMATION id ON id.Identifier = v.Identifier INNER JOIN
 VACCINATION_CENTER vc ON vc.Center_ID = v.Center_Id WHERE v.Identifier = '121434334' AND v.Second_Dose_Date IS NOT NULL
 
+----------->Show serial no
+SELECT Serial FROM COVID_AFFECTED WHERE Identifier = '1000000003';
+
+
 SELECT v.Center_Id, v.Identifier, id.FullName, id.Gender,v.First_Dose_Date, v.Second_Dose_Date,v.Vaccine_Brand, vc.Institute_Name FROM VACCINE v
 INNER JOIN VACCINATION_CENTER vc ON v.Center_ID = vc.Center_Id
 INNER JOIN IDENTIFIER_INFORMATION id ON v.Identifier = id.Identifier WHERE v.Identifier= '1234'
@@ -422,4 +428,5 @@ SELECT * FROM IDENTIFIER_INFORMATION WHERE IDENTIFIER = '121434334'
 
 SELECT * FROM VACCINE v
 INNER JOIN IDENTIFIER_INFORMATION ON v.Identifier = IDENTIFIER_INFORMATION.Identifier
+
 

@@ -725,10 +725,10 @@ public class RegisterForm extends javax.swing.JFrame {
         try {
             ResultSet set = DBConnection.makeQuery(serial);
             if(set.next()){
-                return set.getInt("Serial");
+                return (set.getInt("Serial") + 1);
             }
         } catch (SQLException ex) {
-            Logger.getLogger(RegisterForm.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Error in finding serial no");
         }
         return 1;
     }

@@ -1448,24 +1448,21 @@ public class AdminPanel extends javax.swing.JFrame {
         int firstDoseGiven = 0;
         int secondDoseGiven = 0;
         try {
-            String query = "SELECT p.Identifier, p.Age, p.City, p.Area, v.First_Dose_Date, v.Second_Dose_Date "
+            String query = "SELECT c.Serial, p.Identifier, p.Age, p.City, p.Area, v.First_Dose_Date, v.Second_Dose_Date "
                     + "FROM VACCINE v JOIN (SELECT Birth_Registration_Number AS 'Identifier' , Birth_Date, Mobile_Number, City, Area, Ward_Number, Age "
                     + "FROM PERSON_BIRTH_C UNION SELECT NID AS 'Identifier', Birth_Date, Mobile_Number, City, Area, Ward_Number, Age FROM PERSON_NID) p "
-                    + "ON (v.Identifier = p.Identifier) order by p.Age desc, v.First_Dose_Date asc";
+                    + "                            ON (v.Identifier = p.Identifier) JOIN COVID_AFFECTED c ON (c.Identifier = p.Identifier) order by c.Serial asc, p.Age desc, v.First_Dose_Date asc ";
             dashBoardQuery = query;
             ResultSet set = DBConnection.makeQuery(query);
 
             int colCount = set.getMetaData().getColumnCount();
-
             dashboardColName = new ArrayList<>();
-            dashboardColName.add("Serial");
             for (int i = 1; i <= colCount; i++) {
                 dashboardColName.add(set.getMetaData().getColumnName(i));
             }
             dashboardColName.add("Center");
             makeColumn(jDashboardTable, dashboardColName);
-
-            while (set.next()) {
+            while (set.next()) {            
                 if (set.getString(dashboardColName.get(5)) == null) {
                     firstDoseGiven++;
                 }
@@ -1476,9 +1473,7 @@ public class AdminPanel extends javax.swing.JFrame {
                     continue;
                 }
                 ArrayList<Object> temp = new ArrayList<>();
-//                Resultset set = DBConnection.makeQuery("SELECT Serial as 'Serial' FROM Covid_Affected");
-                temp.add(registered + 1);
-                for (int i = 1; i <= colCount; i++) {
+                for (int i = 0; i < colCount; i++) {
 
                     temp.add(set.getString(dashboardColName.get(i)));
                 }
@@ -1504,7 +1499,6 @@ public class AdminPanel extends javax.swing.JFrame {
             ResultSet set = DBConnection.makeQuery(query);
             if (set.next()) {
                 vaccineLeft.setText(String.valueOf(set.getInt("Amount_Left")));
-//                System.out.println(set.getString("Amount_Left"));
             } else {
                 System.out.println("Unavailable");
             }
@@ -1519,7 +1513,6 @@ public class AdminPanel extends javax.swing.JFrame {
             ResultSet set = DBConnection.makeQuery(query);
             if (set.next()) {
                 vaccineAdministered.setText(String.valueOf(set.getInt("Amount_Administered")));
-//                System.out.println(set.getString("Amount_Administered"));
             } else {
                 System.out.println("Unavailable");
             }

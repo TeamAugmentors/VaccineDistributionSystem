@@ -15,6 +15,8 @@ import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -173,6 +175,11 @@ public class MainMenu extends javax.swing.JFrame {
         });
 
         jButton2.setText("Check Position");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         jButton3.setText("Get Certificate");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
@@ -254,7 +261,7 @@ public class MainMenu extends javax.swing.JFrame {
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         // TODO add your handling code here:
-        String input = JOptionPane.showInputDialog(this, "NID/Birth Certificate Number");
+        String input = JOptionPane.showInputDialog(this, "NID/Birth Registration Number");
 
         String query = "SELECT u.NID, id.FullName, u.Birth_Date, id.Gender, v.First_Dose_Date, v.Vaccine_Brand, v.Second_Dose_Date, v.Vaccine_Brand, vc.Institute_Name  FROM VACCINE v INNER JOIN "
                 + "(SELECT * FROM PERSON_NID UNION SELECT * FROM PERSON_BIRTH_C) u ON u.NID = v.identifier INNER JOIN "
@@ -310,6 +317,24 @@ public class MainMenu extends javax.swing.JFrame {
 
         System.out.println(query);
     }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        try {
+            // TODO add your handling code here:
+            String input = JOptionPane.showInputDialog(this, "NID/Birth Registration Number");
+            String query = "SELECT Serial FROM COVID_AFFECTED WHERE Identifier = '";
+            query += input + "'";
+            ResultSet set = DBConnection.makeQuery(query);
+            if (set.next()) {
+                String serialNo = set.getString("Serial");
+                JOptionPane.showMessageDialog(this, "Your serial is: " + serialNo);
+            }else {
+                JOptionPane.showMessageDialog(this, "Register first or check if you entered NID/Birth Registration number correctly");
+            }
+        } catch (SQLException ex) {
+            System.out.println("Error in showing serial no in main menu");
+        }
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     public class PrintPanelToPDF implements Printable {
 
