@@ -15,9 +15,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
 import java.net.URI;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -30,14 +28,11 @@ import javax.swing.JPanel;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EventObject;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -90,13 +85,6 @@ public class AdminPanel extends javax.swing.JFrame {
 
         panelEditorPane.setVisible(false);
 
-        //table stuff
-        resultTable.getModel().addTableModelListener(new TableModelListener() {
-            public void tableChanged(TableModelEvent e) {
-                // your code goes here, whatever you want to do when something changes in the table
-            }
-        });
-
         for (int i = 0; i < labels.length; i++) {
             map.put(labels[i], panels[i]);
         }
@@ -131,6 +119,25 @@ public class AdminPanel extends javax.swing.JFrame {
                     }
                 }
 
+            }
+        });
+
+        jDashboardTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent event) {
+                if (!event.getValueIsAdjusting()) {
+                    currentDashboardColumnData = new ArrayList<>();
+                    currentDashboardRowData = new ArrayList<>();
+                    if (resultTable.getSelectedRow() >= 0) {
+                        for (int i = 0; i < jDashboardTable.getColumnCount(); i++) {
+                            currentDashboardColumnData.add(jDashboardTable.getColumnName(i));
+                            if (jDashboardTable.getValueAt(jDashboardTable.getSelectedRow(), i) != null) {
+                                currentDashboardRowData.add(jDashboardTable.getValueAt(jDashboardTable.getSelectedRow(), i).toString());
+                            } else {
+                                currentDashboardRowData.add("NULL");
+                            }
+                        }
+                    }
+                }
             }
         });
     }
@@ -1059,7 +1066,7 @@ public class AdminPanel extends javax.swing.JFrame {
 
             currentResultSet = set;
 
-            attachListenerToTable(resultTable);
+            attachListenerToTable(resultTable, currentRowData, currentColumnData);
 
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -1069,7 +1076,11 @@ public class AdminPanel extends javax.swing.JFrame {
     ArrayList<String> currentColumnData;
     ArrayList<String> currentRowData;
 
-    void attachListenerToTable(JTable table) {
+    ArrayList<String> currentDashboardColumnData;
+
+    ArrayList<String> currentDashboardRowData;
+
+    void attachListenerToTable(JTable table, ArrayList<String> currentRowData, ArrayList<String> currentColumnData) {
         String tableName = boxTables.getSelectedItem().toString();
 
         table.getModel().addTableModelListener(new TableModelListener() {
@@ -1078,7 +1089,11 @@ public class AdminPanel extends javax.swing.JFrame {
 
                 ArrayList<String> rowData = new ArrayList<>();
                 for (int i = 0; i < table.getColumnCount(); i++) {
-                    rowData.add(table.getValueAt(table.getSelectedRow(), i).toString());
+                    if (table.getValueAt(table.getSelectedRow(), i) == null) {
+                        rowData.add("");
+                    } else {
+                        rowData.add(table.getValueAt(table.getSelectedRow(), i).toString());
+                    }
                 }
 
                 if (!rowData.equals(currentRowData)) {
@@ -1564,6 +1579,8 @@ public class AdminPanel extends javax.swing.JFrame {
         firstDoseNo.setText(String.valueOf(registered - firstDoseGiven));
         updateAmountLeft();
         updateAmountAdministered();
+
+        attachListenerToTable(jDashboardTable, currentDashboardRowData, currentDashboardColumnData);
     }
 
     private void updateAmountLeft() {
