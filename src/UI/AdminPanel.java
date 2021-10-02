@@ -42,6 +42,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -112,22 +114,43 @@ public class AdminPanel extends javax.swing.JFrame {
             }
         });
 
-        System.out.println(boxTables.getItemCount());
+        resultTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent event) {
+                if (!event.getValueIsAdjusting()) {
+                    currentColumnData = new ArrayList<>();
+                    currentRowData = new ArrayList<>();
+                    if (resultTable.getSelectedRow() >= 0) {
+                        for (int i = 0; i < resultTable.getColumnCount(); i++) {
+                            currentColumnData.add(resultTable.getColumnName(i));
+                            if (resultTable.getValueAt(resultTable.getSelectedRow(), i) != null) {
+                                currentRowData.add(resultTable.getValueAt(resultTable.getSelectedRow(), i).toString());
+                            } else {
+                                currentRowData.add("NULL");
+                            }
+                        }
+                    }
+                }
 
+            }
+        });
     }
 
     private void executeTableQuery() {
         try {
             //populate tables
+
             DatabaseMetaData metaData = DBConnection.getGlobalConnection().getMetaData();
 
             String[] types = {"TABLE"};
             ResultSet tables = metaData.getTables(null, null, "%", types);
             boxTables.removeAllItems();
+
             while (tables.next()) {
+
                 if (!(tables.getString("TABLE_NAME").charAt(0) >= 'a')) {
 
                     boxTables.addItem(tables.getString("TABLE_NAME"));
+
                     ResultSet set = DBConnection.makeQuery("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = N'" + tables.getString("TABLE_NAME") + "'");
 
                     ArrayList<String> str = new ArrayList<>();
@@ -198,6 +221,7 @@ public class AdminPanel extends javax.swing.JFrame {
         init();
         attachPanel(map.get(labelHome));
         requestFocusInWindow();
+
     }
 
     /**
@@ -255,11 +279,11 @@ public class AdminPanel extends javax.swing.JFrame {
         resultTable = new JTable(){
 
         };
+        resultTable.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
         panelCheckbox = new javax.swing.JPanel();
         jButton2 = new javax.swing.JButton();
         buttonAddRow = new javax.swing.JButton();
         buttonAddColumn = new javax.swing.JButton();
-        buttonUpdate = new javax.swing.JButton();
         buttonDeleteColumn = new javax.swing.JButton();
         buttonDeleteRow = new javax.swing.JButton();
         panelSql = new javax.swing.JPanel();
@@ -397,9 +421,9 @@ public class AdminPanel extends javax.swing.JFrame {
                 .addContainerGap(58, Short.MAX_VALUE))
         );
 
-        panelDashboard.setMaximumSize(new java.awt.Dimension(500, 598));
-        panelDashboard.setMinimumSize(new java.awt.Dimension(500, 598));
-        panelDashboard.setPreferredSize(new java.awt.Dimension(500, 598));
+        panelDashboard.setMaximumSize(new java.awt.Dimension(550, 700));
+        panelDashboard.setMinimumSize(new java.awt.Dimension(550, 700));
+        panelDashboard.setPreferredSize(new java.awt.Dimension(550, 700));
         panelDashboard.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 panelDashboardMouseClicked(evt);
@@ -449,7 +473,7 @@ public class AdminPanel extends javax.swing.JFrame {
         jLabel19.setText("Total vaccine required  :");
 
         jLabel20.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jLabel20.setText("Currently Registered:");
+        jLabel20.setText("Currently Registered");
 
         jButton5.setText("Show");
         jButton5.addActionListener(new java.awt.event.ActionListener() {
@@ -463,37 +487,39 @@ public class AdminPanel extends javax.swing.JFrame {
         panelDashboardLayout.setHorizontalGroup(
             panelDashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelDashboardLayout.createSequentialGroup()
-                .addGap(19, 19, 19)
+                .addContainerGap()
                 .addGroup(panelDashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(panelDashboardLayout.createSequentialGroup()
-                        .addComponent(jLabel14)
-                        .addGap(18, 18, 18)
-                        .addComponent(vaccineRegister, javax.swing.GroupLayout.PREFERRED_SIZE, 196, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(panelDashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(panelDashboardLayout.createSequentialGroup()
+                                .addComponent(jLabel14)
+                                .addGap(18, 18, 18)
+                                .addComponent(vaccineRegister, javax.swing.GroupLayout.PREFERRED_SIZE, 196, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(panelDashboardLayout.createSequentialGroup()
+                                .addComponent(jLabel17)
+                                .addGap(18, 18, 18)
+                                .addComponent(firstDoseNo, javax.swing.GroupLayout.PREFERRED_SIZE, 196, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(panelDashboardLayout.createSequentialGroup()
+                                .addComponent(jLabel3)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(vaccineLeft, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel19)
+                                .addGap(18, 18, 18)
+                                .addComponent(firstDoseNo1, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel18)
+                                .addGap(24, 24, 24)
+                                .addComponent(vaccineAdministered, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(0, 53, Short.MAX_VALUE))
                     .addGroup(panelDashboardLayout.createSequentialGroup()
-                        .addComponent(jLabel17)
-                        .addGap(18, 18, 18)
-                        .addComponent(firstDoseNo, javax.swing.GroupLayout.PREFERRED_SIZE, 196, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(panelDashboardLayout.createSequentialGroup()
-                        .addComponent(jLabel3)
+                        .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 243, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton5)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(vaccineLeft, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel19)
-                        .addGap(18, 18, 18)
-                        .addComponent(firstDoseNo1, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel18)
-                        .addGap(24, 24, 24)
-                        .addComponent(vaccineAdministered, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(panelDashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panelDashboardLayout.createSequentialGroup()
-                            .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 243, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panelDashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jButton5)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 462, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
         );
         panelDashboardLayout.setVerticalGroup(
             panelDashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -514,15 +540,15 @@ public class AdminPanel extends javax.swing.JFrame {
                     .addComponent(vaccineAdministered)
                     .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(vaccineLeft))
-                .addGap(27, 27, 27)
+                .addGap(28, 28, 28)
                 .addGroup(panelDashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel20, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(panelDashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jButton5))
+                    .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 375, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jButton5)
-                .addGap(24, 24, 24))
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 476, Short.MAX_VALUE)
+                .addGap(58, 58, 58))
         );
 
         panelDatabase.setMaximumSize(new java.awt.Dimension(550, 700));
@@ -605,13 +631,6 @@ public class AdminPanel extends javax.swing.JFrame {
             }
         });
 
-        buttonUpdate.setText("Update");
-        buttonUpdate.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                buttonUpdateActionPerformed(evt);
-            }
-        });
-
         buttonDeleteColumn.setText("- Column");
         buttonDeleteColumn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -663,7 +682,6 @@ public class AdminPanel extends javax.swing.JFrame {
                                 .addComponent(topSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(panelDatabaseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 517, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(buttonUpdate)
                                 .addGroup(panelDatabaseLayout.createSequentialGroup()
                                     .addComponent(buttonAddRow)
                                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -714,10 +732,8 @@ public class AdminPanel extends javax.swing.JFrame {
                         .addComponent(buttonDeleteColumn)
                         .addComponent(buttonDeleteRow)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 297, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(buttonUpdate)
-                .addContainerGap(50, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 306, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(75, Short.MAX_VALUE))
         );
 
         panelSql.setMaximumSize(new java.awt.Dimension(550, 700));
@@ -937,6 +953,7 @@ public class AdminPanel extends javax.swing.JFrame {
 
         refresh();
 
+
     }//GEN-LAST:event_none
 
 
@@ -964,9 +981,12 @@ public class AdminPanel extends javax.swing.JFrame {
         evt.getComponent().setCursor(new Cursor(Cursor.HAND_CURSOR));
     }//GEN-LAST:event_changeToHand
 
+
     private void executeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_executeButtonActionPerformed
         // TODO add your handling code here:
+
         String query = "SELECT TOP " + topSpinner.getValue() + " ";
+
         for (int i = 0; i < checkBoxArr.length; i++) {
             if (checkBoxArr[i].isSelected()) {
                 query += checkBoxArr[i].getText();
@@ -986,7 +1006,11 @@ public class AdminPanel extends javax.swing.JFrame {
         if (!whereTextField.getText().equals("")) {
             query += " WHERE " + whereTextField.getText();
         }
+
         databaseQuery = query;
+
+        System.out.println(query);
+
         try {
             ResultSet set = DBConnection.makeQuery(query);
             ResultSet set2 = DBConnection.makeQuery(query);
@@ -1035,10 +1059,64 @@ public class AdminPanel extends javax.swing.JFrame {
 
             currentResultSet = set;
 
+            attachListenerToTable(resultTable);
+
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
     }//GEN-LAST:event_executeButtonActionPerformed
+
+    ArrayList<String> currentColumnData;
+    ArrayList<String> currentRowData;
+
+    void attachListenerToTable(JTable table) {
+        String tableName = boxTables.getSelectedItem().toString();
+
+        table.getModel().addTableModelListener(new TableModelListener() {
+
+            public void tableChanged(TableModelEvent e) {
+
+                ArrayList<String> rowData = new ArrayList<>();
+                for (int i = 0; i < table.getColumnCount(); i++) {
+                    rowData.add(table.getValueAt(table.getSelectedRow(), i).toString());
+                }
+
+                if (!rowData.equals(currentRowData)) {
+                    //Get modified element
+                    ArrayList<String> temp = new ArrayList<>(rowData);
+                    temp.removeAll(currentRowData);
+                    String modifiedData = temp.get(0);
+
+                    int col = rowData.indexOf(modifiedData);
+
+                    String updateQuery = "UPDATE " + tableName + " SET " + currentColumnData.get(col) + " = '" + modifiedData + "' "
+                            + " WHERE ";
+
+                    for (int i = 0; i < currentColumnData.size(); i++) {
+                        if (i != col) {
+                            updateQuery += " " + currentColumnData.get(i) + " = '" + currentRowData.get(i) + "' AND";
+                        }
+                    }
+
+                    updateQuery = String.copyValueOf(updateQuery.toCharArray(), 0, updateQuery.length() - 3);
+
+                    try {
+                        DBConnection.makeQuery(updateQuery);
+                    } catch (SQLException ex) {
+                        if (ex.getErrorCode() == 0) {
+                            JOptionPane.showMessageDialog(AdminPanel.this, "Update at " + tableName + " successful!");
+                        } else {
+                            JOptionPane.showMessageDialog(AdminPanel.this, "Error! " + ex.getMessage());
+                        }
+
+                        table.clearSelection();
+                        refresh();
+                    }
+                }
+            }
+        });
+
+    }
 
     void makeColumn(JTable table, ArrayList<String> string) {
 
@@ -1203,10 +1281,6 @@ public class AdminPanel extends javax.swing.JFrame {
         executeButtonActionPerformed(null);
     }
 
-    private void buttonUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonUpdateActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_buttonUpdateActionPerformed
-
     private void buttonDeleteColumnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonDeleteColumnActionPerformed
         // TODO add your handling code here:
         String table = boxTables.getSelectedItem().toString();
@@ -1222,7 +1296,6 @@ public class AdminPanel extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(this, "Error! " + e.getMessage());
             } else {
                 JOptionPane.showMessageDialog(this, "Successfully deleted!");
-
                 refresh();
             }
         }
@@ -1462,7 +1535,7 @@ public class AdminPanel extends javax.swing.JFrame {
             }
             dashboardColName.add("Center");
             makeColumn(jDashboardTable, dashboardColName);
-            while (set.next()) {            
+            while (set.next()) {
                 if (set.getString(dashboardColName.get(5)) == null) {
                     firstDoseGiven++;
                 }
@@ -1557,7 +1630,6 @@ public class AdminPanel extends javax.swing.JFrame {
     private javax.swing.JButton buttonDeleteColumn;
     private javax.swing.JButton buttonDeleteRow;
     private javax.swing.JButton buttonExecuteSelectedText;
-    private javax.swing.JButton buttonUpdate;
     private javax.swing.JButton buttonUploadFile;
     private javax.swing.JButton executeButton;
     private javax.swing.JLabel firstDoseNo;
