@@ -1670,6 +1670,7 @@ public class AdminPanel extends javax.swing.JFrame {
                     secondDoseGiven++;
                 }
                 if (set.getString(dashboardColName.get(5)) != null && set.getString(dashboardColName.get(6)) != null) {
+                    setAmount(set.getString(dashboardColName.get(7)));
                     continue;
                 }
                 ArrayList<Object> temp = new ArrayList<>();
@@ -1709,6 +1710,19 @@ public class AdminPanel extends javax.swing.JFrame {
 
     }
 
+    private void setAmount(String brand){
+        String query = "UPDATE STORAGE set Amount_Administered = Amount_Administered + 1, Amount_Left = Amount_Left - 1 WHERE Vaccine_Brand ='" + brand +"'";
+        try {
+            ResultSet set = DBConnection.makeQuery(query);
+        } catch (SQLException ex) {
+            if(ex.getErrorCode()==0){
+                System.out.println("Success");
+            }else{
+                System.out.println("Error in updating amount left and administered");
+            }
+        }
+        
+    }
     private void updateAmountLeft() {
         String query = "SELECT SUM(Amount_Left) AS Amount_Left FROM STORAGE";
         try {
