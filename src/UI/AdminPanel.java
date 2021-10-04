@@ -1680,6 +1680,7 @@ public class AdminPanel extends javax.swing.JFrame {
                 }
                 //Get the city name
                 String[] str = getCenter(set.getString(dashboardColName.get(3)));
+                System.out.println(Arrays.toString(str));
                 String centerName = str[0];
                 String centerId = str[1];
 
@@ -1767,7 +1768,7 @@ public class AdminPanel extends javax.swing.JFrame {
         } catch (SQLException ex) {
             System.out.println("Error in faching center info");
         }
-        return new String[]{"N/A"};
+        return new String[]{"N/A", "N/A"};
     }
 
     /**

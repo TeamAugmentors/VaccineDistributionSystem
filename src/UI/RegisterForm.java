@@ -713,9 +713,11 @@ public class RegisterForm extends javax.swing.JFrame {
                         System.out.println(ex.getMessage());
                     }
                 }
+            } else if (ex.getErrorCode() == 2627 || ex.getErrorCode() == 2601){
+                JOptionPane.showMessageDialog(this, "This identifier has already been registered");
             } else {
                 System.out.println(ex.getMessage());
-                JOptionPane.showMessageDialog(this, "Sorry you are not old enough for the vaccine");
+                JOptionPane.showMessageDialog(this, "Sorry, you are not old enough for the vaccine");
             }
         }
     }

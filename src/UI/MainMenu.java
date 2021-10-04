@@ -309,7 +309,7 @@ public class MainMenu extends javax.swing.JFrame {
                 label1.setText(String.format("%.0f", Math.random() * 1000000000));
 
             } else {
-                JOptionPane.showMessageDialog(this, "Sorry, your are not eligible for a certificate at the moment");
+                JOptionPane.showMessageDialog(this, "Sorry, you are not eligible for a certificate at the moment");
             }
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage());
