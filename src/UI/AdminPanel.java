@@ -28,6 +28,7 @@ import javax.swing.JPanel;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EventObject;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
@@ -102,44 +103,44 @@ public class AdminPanel extends javax.swing.JFrame {
             }
         });
 
-        resultTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            public void valueChanged(ListSelectionEvent event) {
-                if (!event.getValueIsAdjusting()) {
-                    currentColumnData = new ArrayList<>();
-                    currentRowData = new ArrayList<>();
-                    if (resultTable.getSelectedRow() >= 0) {
-                        for (int i = 0; i < resultTable.getColumnCount(); i++) {
-                            currentColumnData.add(resultTable.getColumnName(i));
-                            if (resultTable.getValueAt(resultTable.getSelectedRow(), i) != null) {
-                                currentRowData.add(resultTable.getValueAt(resultTable.getSelectedRow(), i).toString());
-                            } else {
-                                currentRowData.add("NULL");
-                            }
-                        }
-                    }
-                }
-
-            }
-        });
-
-        jDashboardTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            public void valueChanged(ListSelectionEvent event) {
-                if (!event.getValueIsAdjusting()) {
-                    currentDashboardColumnData = new ArrayList<>();
-                    currentDashboardRowData = new ArrayList<>();
-                    if (resultTable.getSelectedRow() >= 0) {
-                        for (int i = 0; i < jDashboardTable.getColumnCount(); i++) {
-                            currentDashboardColumnData.add(jDashboardTable.getColumnName(i));
-                            if (jDashboardTable.getValueAt(jDashboardTable.getSelectedRow(), i) != null) {
-                                currentDashboardRowData.add(jDashboardTable.getValueAt(jDashboardTable.getSelectedRow(), i).toString());
-                            } else {
-                                currentDashboardRowData.add("NULL");
-                            }
-                        }
-                    }
-                }
-            }
-        });
+//        resultTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+//            public void valueChanged(ListSelectionEvent event) {
+//                if (!event.getValueIsAdjusting()) {
+//                    currentColumnData = new ArrayList<>();
+//                    currentRowData = new ArrayList<>();
+//                    if (resultTable.getSelectedRow() >= 0) {
+//                        for (int i = 0; i < resultTable.getColumnCount(); i++) {
+//                            currentColumnData.add(resultTable.getColumnName(i));
+//                            if (resultTable.getValueAt(resultTable.getSelectedRow(), i) != null) {
+//                                currentRowData.add(resultTable.getValueAt(resultTable.getSelectedRow(), i).toString());
+//                            } else {
+//                                currentRowData.add("NULL");
+//                            }
+//                        }
+//                    }
+//                }
+//
+//            }
+//        });
+//
+//        jDashboardTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+//            public void valueChanged(ListSelectionEvent event) {
+//                if (!event.getValueIsAdjusting()) {
+//                    currentDashboardColumnData = new ArrayList<>();
+//                    currentDashboardRowData = new ArrayList<>();
+//                    if (resultTable.getSelectedRow() >= 0) {
+//                        for (int i = 0; i < jDashboardTable.getColumnCount(); i++) {
+//                            currentDashboardColumnData.add(jDashboardTable.getColumnName(i));
+//                            if (jDashboardTable.getValueAt(jDashboardTable.getSelectedRow(), i) != null) {
+//                                currentDashboardRowData.add(jDashboardTable.getValueAt(jDashboardTable.getSelectedRow(), i).toString());
+//                            } else {
+//                                currentDashboardRowData.add("NULL");
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        });
     }
 
     private void executeTableQuery() {
@@ -257,7 +258,7 @@ public class AdminPanel extends javax.swing.JFrame {
         panelDashboard = new javax.swing.JPanel();
         jButton4 = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jDashboardTable = new javax.swing.JTable();
+        dashboardTable = new javax.swing.JTable();
         jLabel3 = new javax.swing.JLabel();
         jLabel18 = new javax.swing.JLabel();
         vaccineLeft = new javax.swing.JLabel();
@@ -269,7 +270,7 @@ public class AdminPanel extends javax.swing.JFrame {
         firstDoseNo1 = new javax.swing.JLabel();
         jLabel19 = new javax.swing.JLabel();
         jLabel20 = new javax.swing.JLabel();
-        jButton5 = new javax.swing.JButton();
+        buttonUpdate = new javax.swing.JButton();
         panelDatabase = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         boxTables = new javax.swing.JComboBox<>();
@@ -446,7 +447,7 @@ public class AdminPanel extends javax.swing.JFrame {
             }
         });
 
-        jDashboardTable.setModel(new javax.swing.table.DefaultTableModel(
+        dashboardTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -457,7 +458,7 @@ public class AdminPanel extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane2.setViewportView(jDashboardTable);
+        jScrollPane2.setViewportView(dashboardTable);
 
         jLabel3.setText("Vaccine left:");
 
@@ -482,10 +483,10 @@ public class AdminPanel extends javax.swing.JFrame {
         jLabel20.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel20.setText("Currently Registered");
 
-        jButton5.setText("Show");
-        jButton5.addActionListener(new java.awt.event.ActionListener() {
+        buttonUpdate.setText("Update");
+        buttonUpdate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton5ActionPerformed(evt);
+                buttonUpdateActionPerformed(evt);
             }
         });
 
@@ -523,7 +524,7 @@ public class AdminPanel extends javax.swing.JFrame {
                     .addGroup(panelDashboardLayout.createSequentialGroup()
                         .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 243, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton5)
+                        .addComponent(buttonUpdate)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
@@ -551,7 +552,7 @@ public class AdminPanel extends javax.swing.JFrame {
                 .addGroup(panelDashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(panelDashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jButton5))
+                        .addComponent(buttonUpdate))
                     .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 476, Short.MAX_VALUE)
@@ -942,6 +943,7 @@ public class AdminPanel extends javax.swing.JFrame {
         if (evt.getComponent() == labelDashboard) {
             addDashoardData();
         }
+
         JLabel currentLabel = (JLabel) evt.getComponent();
         currentLabel.setOpaque(true);
 
@@ -959,8 +961,6 @@ public class AdminPanel extends javax.swing.JFrame {
         currentLabel.setForeground(Color.WHITE);
 
         refresh();
-
-
     }//GEN-LAST:event_none
 
 
@@ -1066,8 +1066,7 @@ public class AdminPanel extends javax.swing.JFrame {
 
             currentResultSet = set;
 
-            attachListenerToTable(resultTable, currentRowData, currentColumnData);
-
+            attachListenerToTable(resultTable);
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -1080,58 +1079,109 @@ public class AdminPanel extends javax.swing.JFrame {
 
     ArrayList<String> currentDashboardRowData;
 
-    void attachListenerToTable(JTable table, ArrayList<String> currentRowData, ArrayList<String> currentColumnData) {
+    void attachListenerToTable(JTable table) {
+        ArrayList<String> rowData = new ArrayList<>();
+
         String tableName = boxTables.getSelectedItem().toString();
 
-        table.getModel().addTableModelListener(new TableModelListener() {
+        table.getModel().addTableModelListener((e) -> {
+            System.out.println("row " + resultTable.getSelectedRow());
+            System.out.println("value is " + resultTable.getValueAt(0, 0).toString());
 
-            public void tableChanged(TableModelEvent e) {
+            int row = resultTable.getSelectedRow();
 
-                ArrayList<String> rowData = new ArrayList<>();
-                for (int i = 0; i < table.getColumnCount(); i++) {
-                    if (table.getValueAt(table.getSelectedRow(), i) == null) {
-                        rowData.add("");
-                    } else {
-                        rowData.add(table.getValueAt(table.getSelectedRow(), i).toString());
-                    }
-                }
+            for (int i = 0; i < resultTable.getColumnCount(); i++) {
 
-                if (!rowData.equals(currentRowData)) {
-                    //Get modified element
-                    ArrayList<String> temp = new ArrayList<>(rowData);
-                    temp.removeAll(currentRowData);
-                    String modifiedData = temp.get(0);
+                if (resultTable.getValueAt(row, i) != null) {
 
-                    int col = rowData.indexOf(modifiedData);
-
-                    String updateQuery = "UPDATE " + tableName + " SET " + currentColumnData.get(col) + " = '" + modifiedData + "' "
-                            + " WHERE ";
-
-                    for (int i = 0; i < currentColumnData.size(); i++) {
-                        if (i != col) {
-                            updateQuery += " " + currentColumnData.get(i) + " = '" + currentRowData.get(i) + "' AND";
-                        }
-                    }
-
-                    updateQuery = String.copyValueOf(updateQuery.toCharArray(), 0, updateQuery.length() - 3);
-
-                    try {
-                        DBConnection.makeQuery(updateQuery);
-                    } catch (SQLException ex) {
-                        if (ex.getErrorCode() == 0) {
-                            JOptionPane.showMessageDialog(AdminPanel.this, "Update at " + tableName + " successful!");
-                        } else {
-                            JOptionPane.showMessageDialog(AdminPanel.this, "Error! " + ex.getMessage());
-                        }
-
-                        table.clearSelection();
-                        refresh();
-                    }
+                    rowData.add(resultTable.getValueAt(row, i).toString());
+                } else {
+                    rowData.add("");
                 }
             }
+
+            String updateQuery = "UPDATE " + tableName + " SET ";
+
+            for (int i = 1; i < resultTable.getColumnCount(); i++) {
+                updateQuery += resultTable.getColumnName(i) + " = ";
+
+                if (rowData.get(i).equals("")) {
+                    updateQuery += "null,";
+                } else {
+                    updateQuery += "'" + rowData.get(i) + "',";
+                }
+            }
+
+            updateQuery = String.valueOf(updateQuery.toCharArray(), 0, updateQuery.length() - 1);
+
+            updateQuery += " WHERE " + resultTable.getColumnName(0) + " = '" + resultTable.getValueAt(row, 0) + "'";
+
+            try {
+                DBConnection.makeQuery(updateQuery);
+            } catch (SQLException ex) {
+                if (ex.getErrorCode() == 0) {
+                    JOptionPane.showMessageDialog(this, "Updated!");
+                    refresh();
+                } else {
+                    JOptionPane.showMessageDialog(this, ex.getMessage());
+                }
+            }
+
         });
 
     }
+//    void attachListenerToTable(JTable table, ArrayList<String> currentRowData, ArrayList<String> currentColumnData) {
+//        String tableName = boxTables.getSelectedItem().toString();
+//
+//        table.getModel().addTableModelListener(new TableModelListener() {
+//
+//            public void tableChanged(TableModelEvent e) {
+//
+//                ArrayList<String> rowData = new ArrayList<>();
+//                for (int i = 0; i < table.getColumnCount(); i++) {
+//                    if (table.getValueAt(table.getSelectedRow(), i) == null) {
+//                        rowData.add("");
+//                    } else {
+//                        rowData.add(table.getValueAt(table.getSelectedRow(), i).toString());
+//                    }
+//                }
+//
+//                if (!rowData.equals(currentRowData)) {
+//                    //Get modified element
+//                    ArrayList<String> temp = new ArrayList<>(rowData);
+//                    temp.removeAll(currentRowData);
+//                    String modifiedData = temp.get(0);
+//
+//                    int col = rowData.indexOf(modifiedData);
+//
+//                    String updateQuery = "UPDATE " + tableName + " SET " + currentColumnData.get(col) + " = '" + modifiedData + "' "
+//                            + " WHERE ";
+//
+//                    for (int i = 0; i < currentColumnData.size(); i++) {
+//                        if (i != col) {
+//                            updateQuery += " " + currentColumnData.get(i) + " = '" + currentRowData.get(i) + "' AND";
+//                        }
+//                    }
+//
+//                    updateQuery = String.copyValueOf(updateQuery.toCharArray(), 0, updateQuery.length() - 3);
+//
+//                    try {
+//                        DBConnection.makeQuery(updateQuery);
+//                    } catch (SQLException ex) {
+//                        if (ex.getErrorCode() == 0) {
+//                            JOptionPane.showMessageDialog(AdminPanel.this, "Update at " + tableName + " successful!");
+//                        } else {
+//                            JOptionPane.showMessageDialog(AdminPanel.this, "Error! " + ex.getMessage());
+//                        }
+//
+//                        table.clearSelection();
+//                        refresh();
+//                    }
+//                }
+//            }
+//        });
+//
+//    }
 
     void makeColumn(JTable table, ArrayList<String> string) {
 
@@ -1522,10 +1572,67 @@ public class AdminPanel extends javax.swing.JFrame {
 
     }//GEN-LAST:event_jButton3ActionPerformed
 
-    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-        // TODO add your handling code here:
-        addDashoardData();
-    }//GEN-LAST:event_jButton5ActionPerformed
+    private void buttonUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonUpdateActionPerformed
+        // TODO add your handling code here: 
+        String[] dates = new String[3];
+
+        if (dashboardTable.getSelectedRow() >= 0) {
+            //row is selected
+            if (dashboardTable.getValueAt(dashboardTable.getSelectedRow(), 7) != null){
+                dates[2] = dashboardTable.getValueAt(dashboardTable.getSelectedRow(), 7).toString();
+            }
+   
+            if (dates[2] != null) {
+                if (dashboardTable.getValueAt(dashboardTable.getSelectedRow(), 5) != null) {
+                    if (!dashboardTable.getValueAt(dashboardTable.getSelectedRow(), 5).equals("")) {
+                        dates[0] = dashboardTable.getValueAt(dashboardTable.getSelectedRow(), 5).toString();
+                    }
+                }
+
+                if (dashboardTable.getValueAt(dashboardTable.getSelectedRow(), 6) != null) {
+                    if (!dashboardTable.getValueAt(dashboardTable.getSelectedRow(), 6).equals("")) {
+                        dates[1] = dashboardTable.getValueAt(dashboardTable.getSelectedRow(), 6).toString();
+                    }
+                }
+
+                if (dates[0] == null && dates[1] == null) {
+                    return;
+                }
+
+                String updateQuery = "";
+                if (dates[0] == null) {
+                    updateQuery = "UPDATE VACCINE SET VACCINE_BRAND = '" + dates[2] + "', FIRST_DOSE_DATE = " + dates[0] + ", SECOND_DOSE_DATE = '" + dates[1] + "', CENTER_ID = '" + dashboardTable.getValueAt(dashboardTable.getSelectedRow(), 9).toString() + "' WHERE IDENTIFIER = " + dashboardTable.getValueAt(dashboardTable.getSelectedRow(), 1);
+                }
+
+                if (dates[1] == null) {
+                    updateQuery = "UPDATE VACCINE SET VACCINE_BRAND = '" + dates[2] + "', FIRST_DOSE_DATE = '" + dates[0] + "', SECOND_DOSE_DATE = " + dates[1] + ",CENTER_ID = '" + dashboardTable.getValueAt(dashboardTable.getSelectedRow(), 9).toString() + "' WHERE IDENTIFIER = " + dashboardTable.getValueAt(dashboardTable.getSelectedRow(), 1);
+                }
+
+                if (dates[0] != null && dates[1] != null) {
+                    updateQuery = "UPDATE VACCINE SET VACCINE_BRAND = '" + dates[2] + "', FIRST_DOSE_DATE = '" + dates[0] + "', SECOND_DOSE_DATE = '" + dates[1] + "', CENTER_ID = '" + dashboardTable.getValueAt(dashboardTable.getSelectedRow(), 9).toString() + "' WHERE IDENTIFIER = " + dashboardTable.getValueAt(dashboardTable.getSelectedRow(), 1);
+
+                }
+
+                System.out.println(updateQuery);
+
+                try {
+                    DBConnection.makeQuery(updateQuery);
+                } catch (SQLException ex) {
+                    if (ex.getErrorCode() == 0) {
+
+                        JOptionPane.showMessageDialog(this, "Successfully updated!");
+                        addDashoardData();
+
+                    } else {
+                        JOptionPane.showMessageDialog(this, ex.getMessage());
+                    }
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "Please enter a vaccine brand");
+            }
+
+        }
+    }//GEN-LAST:event_buttonUpdateActionPerformed
 
     private void panelDashboardMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_panelDashboardMouseClicked
         // TODO add your handling code here:
@@ -1536,7 +1643,7 @@ public class AdminPanel extends javax.swing.JFrame {
         int firstDoseGiven = 0;
         int secondDoseGiven = 0;
         try {
-            String query = "SELECT c.Serial, p.Identifier, p.Age, p.City, p.Area, v.First_Dose_Date, v.Second_Dose_Date "
+            String query = "SELECT c.Serial, p.Identifier, p.Age, p.City, p.Area, v.First_Dose_Date, v.Second_Dose_Date, v.Vaccine_Brand "
                     + "FROM VACCINE v JOIN (SELECT Birth_Registration_Number AS 'Identifier' , Birth_Date, Mobile_Number, City, Area, Ward_Number, Age "
                     + "FROM PERSON_BIRTH_C UNION SELECT NID AS 'Identifier', Birth_Date, Mobile_Number, City, Area, Ward_Number, Age FROM PERSON_NID) p "
                     + "                            ON (v.Identifier = p.Identifier) JOIN COVID_AFFECTED c ON (c.Identifier = p.Identifier) order by c.Serial asc, p.Age desc, v.First_Dose_Date asc ";
@@ -1545,11 +1652,16 @@ public class AdminPanel extends javax.swing.JFrame {
 
             int colCount = set.getMetaData().getColumnCount();
             dashboardColName = new ArrayList<>();
+
             for (int i = 1; i <= colCount; i++) {
                 dashboardColName.add(set.getMetaData().getColumnName(i));
             }
+
             dashboardColName.add("Center");
-            makeColumn(jDashboardTable, dashboardColName);
+            dashboardColName.add("Center_Id");
+
+            makeColumn(dashboardTable, dashboardColName);
+
             while (set.next()) {
                 if (set.getString(dashboardColName.get(5)) == null) {
                     firstDoseGiven++;
@@ -1566,9 +1678,24 @@ public class AdminPanel extends javax.swing.JFrame {
                     temp.add(set.getString(dashboardColName.get(i)));
                 }
                 //Get the city name
-                String center = getCenter(set.getString(dashboardColName.get(3)));
-                temp.add(center);
-                getDefaultTableModel(jDashboardTable).addRow(temp.toArray());
+                String[] str = getCenter(set.getString(dashboardColName.get(3)));
+                String centerName = str[0];
+                String centerId = str[1];
+
+                temp.add(centerName);
+                temp.add(centerId);
+
+                getDefaultTableModel(dashboardTable).addRow(temp.toArray());
+
+                DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
+                rightRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+
+                TableModel tableModel = dashboardTable.getModel();
+
+                for (int columnIndex = 0; columnIndex < tableModel.getColumnCount(); columnIndex++) {
+                    dashboardTable.getColumnModel().getColumn(columnIndex).setCellRenderer(rightRenderer);
+                }
+
                 registered++;
             }
         } catch (SQLException ex) {
@@ -1580,7 +1707,6 @@ public class AdminPanel extends javax.swing.JFrame {
         updateAmountLeft();
         updateAmountAdministered();
 
-        attachListenerToTable(jDashboardTable, currentDashboardRowData, currentDashboardColumnData);
     }
 
     private void updateAmountLeft() {
@@ -1611,8 +1737,8 @@ public class AdminPanel extends javax.swing.JFrame {
         }
     }
 
-    private String getCenter(String city) {
-        String query = "SELECT Institute_Name FROM VACCINATION_CENTER WHERE Center_ID = "
+    private String[] getCenter(String city) {
+        String query = "SELECT Center_Id, Institute_Name FROM VACCINATION_CENTER WHERE Center_ID = "
                 + "ANY(SELECT Center_ID FROM STORAGE WHERE Amount_Left = ANY(SELECT MAX(Amount_Left) "
                 + "FROM (SELECT v.*, s.Amount_Left "
                 + "FROM STORAGE s JOIN (SELECT * FROM VACCINATION_CENTER WHERE City = "
@@ -1622,12 +1748,12 @@ public class AdminPanel extends javax.swing.JFrame {
         try {
             ResultSet set = DBConnection.makeQuery(query);
             if (set.next()) {
-                return set.getString("Institute_Name");
+                return new String[]{set.getString("Institute_Name"), set.getString("Center_Id")};
             }
         } catch (SQLException ex) {
             System.out.println("Error in faching center info");
         }
-        return "N/A";
+        return new String[]{"N/A"};
     }
 
     /**
@@ -1647,7 +1773,9 @@ public class AdminPanel extends javax.swing.JFrame {
     private javax.swing.JButton buttonDeleteColumn;
     private javax.swing.JButton buttonDeleteRow;
     private javax.swing.JButton buttonExecuteSelectedText;
+    private javax.swing.JButton buttonUpdate;
     private javax.swing.JButton buttonUploadFile;
+    private javax.swing.JTable dashboardTable;
     private javax.swing.JButton executeButton;
     private javax.swing.JLabel firstDoseNo;
     private javax.swing.JLabel firstDoseNo1;
@@ -1656,8 +1784,6 @@ public class AdminPanel extends javax.swing.JFrame {
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
-    private javax.swing.JTable jDashboardTable;
     private javax.swing.JEditorPane jEditorPane1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
